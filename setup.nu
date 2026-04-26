@@ -123,16 +123,16 @@ def "main vscode install" [] {
     do -i {
       ^sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
-      let repo = "
-    [code]
-    name=Visual Studio Code
-    baseurl=https://packages.microsoft.com/yumrepos/vscode
-    enabled=1
-    autorefresh=1
-    type=rpm-md
-    gpgcheck=1
-    gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-    "
+      let repo = ([
+        "[code]"
+        "name=Visual Studio Code"
+        "baseurl=https://packages.microsoft.com/yumrepos/vscode"
+        "enabled=1"
+        "autorefresh=1"
+        "type=rpm-md"
+        "gpgcheck=1"
+        "gpgkey=https://packages.microsoft.com/keys/microsoft.asc"
+      ] | str join "\n")
       $repo | ^sudo tee /etc/yum.repos.d/vscode.repo > /dev/null
       ^dnf check-update
     }
