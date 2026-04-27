@@ -175,6 +175,14 @@ def "main vscode" [] {
   main vscode config
 }
 
+def "main docker" [] {
+  if not (has-cmd docker) {
+    sudo dnf install -y docker docker-compose
+    sudo systemctl enable --now docker.socket
+  }
+  sudo usermod -aG docker $env.USER
+}
+
 def wm-install [] {
   main fonts
   log info "Installing window manager packages"
@@ -348,6 +356,12 @@ def "main help" [] {
   print "  help             Show this help message"
   print "  desktop          Run desktop setup (virt, flatpaks, niri)"
   print ""
+  print "  niri             Install and configure niri WM"
+  print "  niri install     Install niri, dms, and related packages"
+  print "  niri config      Apply niri config only"
+  print ""
+  print "  flatpaks         Install flatpak applications"
+  print ""
   print "  vscode           Install vscode and extensions"
   print "  vscode install   Install vscode only"
   print "  vscode config    Install vscode extensions/settings only"
@@ -355,13 +369,12 @@ def "main help" [] {
   print "  virt             Install and configure virt-manager/libvirt"
   print "  virt install     Install virt packages only"
   print "  virt config      Configure libvirt only"
-  print "  niri             Install and configure niri WM"
-  print "  niri install     Install niri, dms, and related packages"
-  print "  niri config      Apply niri config only"
-  print "  flatpaks         Install flatpak applications"
+  print ""
+  print "  docker           Install and configure docker"
+  print "  brew             Install and configure homebrew for linux"
   print "  fish             Install and configure fish shell"
   print "  opencode         Install opencode AI coding agent"
-  print "  brew             Install and configure homebrew for linux"
+  print ""
   print "  stow <package>   Symlink a config package into ~/.config"
   print ""
 }
