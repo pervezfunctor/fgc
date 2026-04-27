@@ -238,7 +238,9 @@ def "main niri install" [] {
 
   log info "Installing niri and dms"
   ^sudo dnf copr enable -y avengemedia/dms
-  si ["niri" "dms" "cliphist"]
+  ^sudo dnf copr enable -y yalter/niri
+  si ["niri" "dms" "cliphist" "dms-greeter"]
+  dms greeter enable
 }
 
 def "main niri config" [] {
