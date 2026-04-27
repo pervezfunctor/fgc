@@ -65,6 +65,9 @@ pixi_packages_install() {
 }
 
 main() {
+  rm -f "${HOME}/.fedora-niri-config.log"
+  touch "${HOME}/.fedora-niri-config.log"
+
   export PATH="/home/linuxbrew/.linuxbrew/bin:$HOME/.pixi/bin:$PATH"
   has_cmd dnf && system_install
   pixi_install
