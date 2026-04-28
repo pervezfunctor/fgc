@@ -32,12 +32,6 @@ export def dir-exists [path: string]: nothing -> bool {
   ($path | path type) == "dir"
 }
 
-def file-or-link-exists [p: path]: nothing -> bool {
-    if not ($p | path exists) { return false }
-    let t = ($p | path type)
-    $t == "file" or $t == "symlink"
-}
-
 export def is-fedora []: nothing -> bool {
   if not ("/etc/redhat-release" | path exists) { return false }
   let content = (open /etc/redhat-release | str downcase)
@@ -50,12 +44,9 @@ export def sln [src: string, dst: string] {
     return
   }
 
-  if (file-or-link-exists $dst) {
-    ^trash $dst
-  }
-
+  do -i { ^trash $dst e> /dev/null }
   log info $"linking ($src) -> ($dst)"
-  ^ln -s $src $dst
+  ^ln -sf $src $dst
 }
 
 export def "main stow" [package: string] {
@@ -111,6 +102,24 @@ def --env bootstrap [] {
   ] {
     path add ($env.HOME | path join $p)
   }
+}
+
+def "main nvim install" [] {
+  pixi global install nvim lazyygit tree-sitter-cli luarocks
+  main fonts
+
+  nvim
+}
+
+def "main nvim config" [] {
+  ^trash ~/.config/nvim
+  ^git clone --depth 1 https://github.com/AstroNvim/template ~/.config/nvim
+  ^trash ~/.config/nvim/.git
+}
+
+def "main nvim" [] {
+  main nvim install
+  main nvim config
 }
 
 def "main brew" [] {
@@ -405,6 +414,10 @@ let COMMANDS = {
   zed: {
     desc: "Install and configure Zed editor"
     run: {|| main zed }
+  }
+  nvim: {
+    desc: "Install and configure(Astro) Neovim"
+    run: {|| main nvim }
   }
 }
 
