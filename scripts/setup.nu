@@ -183,6 +183,53 @@ def "main vscode" [] {
   main vscode config
 }
 
+def is-shell-default [shell_path: string] {
+  open /etc/passwd
+  | lines
+  | parse "{user}:{rest}"
+  | where user == $env.USER
+  | first
+  | get rest
+  | str ends-with $shell_path
+}
+
+def "main fish default" [] {
+  log+ "Setting fish as default shell"
+  let fish_path = (which fish | get 0.path)
+  if not (open /etc/shells | lines | any {|l| $l == $fish_path }) {
+    $fish_path | sudo tee -a /etc/shells
+  }
+  if not (is-shell-default $fish_path) {
+    do -i { chsh -s $fish_path $env.USER }
+  }
+}
+
+def "main fish autostart" [] {
+  let rc_file = ".zshrc"
+  let rc_path = ($env.HOME | path join $rc_file)
+  let marker = "exec fish"
+
+  let snippet = '
+# Auto-start fish for interactive shells
+if [[ $- == *i* ]] && [[ -z "$FISH_LAUNCHED" ]]; then
+  if command -v fish >/dev/null 2>&1; then
+    export FISH_LAUNCHED=1
+    exec fish || echo "Failed to start fish"
+  fi
+fi
+'
+
+  if not ($rc_path | path exists) {
+    error make {msg: $"($rc_file) not found"}
+  }
+  if not (open $rc_path | str contains $marker) {
+    $snippet | save --append $rc_path
+    log+ $"Added fish auto-start to ($rc_file)"
+  } else {
+    log+ $"Fish auto-start already in ($rc_file), skipping"
+  }
+}
+
 def "main docker" [] {
   if not (has-cmd docker) {
     sudo dnf install -y docker docker-compose

@@ -88,15 +88,32 @@ fi
 EOF
 }
 
+fish_config() {
+  has_cmd fish || die "fish not installed. Quitting."
+  if [ -L ~/.config/fish/config.fish ] &&
+    [ "$(readlink ~/.config/fish/config.fish)" = "${DOT_DIR}/fish/config.fish" ]; then
+    return 0
+  fi
+
+  mkdir -p ~/.config/fish 2>/dev/null
+  if [ -f ~/.config/fish/config.fish ]; then
+    log "Trashing existing fish config..."
+    trash ~/.config/fish/config.fish
+  fi
+  ln -sf "${DOT_DIR}/fish/config.fish" ~/.config/fish/config.fish
+
+  launch_fish_in_bash_install
+}
+
 fresh_install() {
   has_cmd dnf && system_install
+  dotfiles_install
 
   pixi_install
   pixi_packages_install
-  has_cmd nu || die "nu is not installed. Quitting."
 
-  dotfiles_install
-  launch_fish_in_bash_install
+  fish_config
+  has_cmd nu || die "nu is not installed. Quitting."
 }
 
 has_commands() {
@@ -106,11 +123,15 @@ has_commands() {
   return 0
 }
 
-main() {
-  rm -f "${HOME}/.fedora-config.log"
-  touch "${HOME}/.fedora-config.log"
+init_log() {
+  echo "Initializing log..."
+  rm -f "${HOME}/.mac-setup.log" 2>/dev/null
+  touch "${HOME}/.mac-setup.log"
+}
 
+main() {
   export PATH="/home/linuxbrew/.linuxbrew/bin:$HOME/.pixi/bin:$PATH"
+  init_log
 
   if is_fish_in_bash && has_commands git pixi fish nu trash starship gum; then
     log "All commands found, skipping fresh install. Use '${DOT_DIR}/scripts/setup.nu' to configure your system"
