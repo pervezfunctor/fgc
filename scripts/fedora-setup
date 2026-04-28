@@ -49,7 +49,7 @@ system_install() {
 
   sudo dnf install -y git gcc pipx libatomic make plocate tar tmux unzip \
     zstd bat direnv duf eza fd fzf gdu gh jq ripgrep tealdeer trash-cli \
-    zoxide difftastic less htop gum tmux
+    zoxide difftastic less htop gum tmux cmake
 
   tldr --update || die "Failed to install dependencies"
 
@@ -69,8 +69,12 @@ pixi_packages_install() {
   pixi global install carapace nushell xh television starship bottom
 }
 
+is_fish_in_bash() {
+  grep -q 'exec fish' ~/.bashrc 2>/dev/null
+}
+
 launch_fish_in_bash_install() {
-  grep -q 'exec fish' ~/.bashrc 2>/dev/null || cat <<'EOF' >>~/.bashrc
+  is_fish_in_bash || cat <<'EOF' >>~/.bashrc
 
 # Auto-start fish for interactive shells
 if [[ $- == *i* ]] && [[ -z "$FISH_LAUNCHED" ]]; then
@@ -108,7 +112,7 @@ main() {
 
   export PATH="/home/linuxbrew/.linuxbrew/bin:$HOME/.pixi/bin:$PATH"
 
-  if has_commands git pixi fish nu trash gh starship gum; then
+  if is_fish_in_bash && has_commands git pixi fish nu trash starship gum; then
     log "All commands found, skipping fresh install. Use '${DOT_DIR}/scripts/setup.nu' to configure your system"
   else
     fresh_install

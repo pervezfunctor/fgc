@@ -405,16 +405,12 @@ let COMMANDS = {
     run: {|| main docker }
   }
   flatpaks: {
-    desc: "Install flatpak applications"
+    desc: "Install flatpak applications(zen browser, obsidian)"
     run: {|| main flatpaks }
   }
   brew: {
     desc: "Install Homebrew"
     run: {|| main brew }
-  }
-  opencode: {
-    desc: "Install opencode"
-    run: {|| main opencode }
   }
   zed: {
     desc: "Install and configure Zed editor"
@@ -476,11 +472,16 @@ def "main help" [] {
   print ""
   print "Commands:"
   print "  help             Show this help message"
+  print "  desktop          Configure desktop environment(niri, virt, brew, apps)"
+  print "  stow <package>   Symlink a config package into ~/.config"
 
   commands | each {|row| print $"  ($row.name | fill -w 16) ($row.value.desc)" }
 
   print ""
-  print "  stow <package>   Symlink a config package into ~/.config"
+  print "  opencode         Install opencode(AI)"
+  print "  virt config      Configure libvirt"
+  print "  kitty            Install and Configure Kitty terminal"
+  print "  fish             Install and configure fish shell"
   print ""
 }
 
