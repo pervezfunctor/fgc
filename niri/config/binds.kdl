@@ -1,13 +1,15 @@
 binds {
-    Mod+D { spawn-sh "dms ipc call spotlight toggle"; }
+    Mod+D       { spawn-sh "dms ipc call spotlight toggle"; }
+    Mod+Space   { spawn-sh "dms ipc call spotlight toggle"; }
     Super+Alt+L { spawn-sh "dms ipc call lock lock"; }
 
     Mod+Shift+Slash { show-hotkey-overlay; }
-    Mod+Return { spawn "~/.local/kitty.app/bin/kitty"; }
+
+    Mod+Return  { spawn "~/.local/kitty.app/bin/kitty"; }
 
     Ctrl+Alt+Delete { quit; }
-    Mod+Shift+Q { quit; }
-    Mod+Q { close-window; }
+    Mod+Shift+Q     { quit; }
+    Mod+Q           { close-window; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }
@@ -31,15 +33,16 @@ binds {
     Mod+Shift+Up    { move-window-up; }
     Mod+Shift+Right { move-column-right; }
 
-    Mod+Home { focus-column-first; }
-    Mod+End  { focus-column-last; }
-    Mod+Ctrl+Home { move-column-to-first; }
-    Mod+Ctrl+End  { move-column-to-last; }
+    Mod+Home        { focus-column-first; }
+    Mod+End         { focus-column-last; }
+    Mod+Ctrl+Home   { move-column-to-first; }
+    Mod+Ctrl+End    { move-column-to-last; }
 
     Mod+ALT+H     { focus-monitor-left; }
     Mod+ALT+J     { focus-monitor-down; }
     Mod+ALT+K     { focus-monitor-up; }
     Mod+ALT+L     { focus-monitor-right; }
+
     Mod+Alt+Ctrl+H     { move-column-to-monitor-left; }
     Mod+Alt+Ctrl+J     { move-column-to-monitor-down; }
     Mod+Alt+Ctrl+K     { move-column-to-monitor-up; }
@@ -94,6 +97,7 @@ binds {
     Mod+7 { focus-workspace 7; }
     Mod+8 { focus-workspace 8; }
     Mod+9 { focus-workspace 9; }
+
     Mod+Shift+1 { move-column-to-workspace 1; }
     Mod+Shift+2 { move-column-to-workspace 2; }
     Mod+Shift+3 { move-column-to-workspace 3; }
@@ -106,23 +110,27 @@ binds {
 
     Mod+BracketLeft  { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
-    Mod+R { switch-preset-column-width; }
+
+    Mod+R       { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-window-height; }
-    Mod+Ctrl+R { reset-window-height; }
+    Mod+Ctrl+R  { reset-window-height; }
+
     Mod+F { fullscreen-window; }
     Mod+C { center-column; }
+    Mod+O { toggle-overview; }
+
     Mod+Minus { set-column-width "-10%"; }
     Mod+Equal { set-column-width "+10%"; }
+
     Mod+Shift+Minus { set-window-height "-10%"; }
     Mod+Shift+Equal { set-window-height "+10%"; }
+
     Mod+BackSlash       { toggle-window-floating; }
     Mod+Shift+BackSlash { switch-focus-between-floating-and-tiling; }
 
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
-
-    Mod+O { toggle-overview; }
+    Print       { screenshot; }
+    Ctrl+Print  { screenshot-screen; }
+    Alt+Print   { screenshot-window; }
 
     Mod+Shift+F { spawn "nautilus"; }
     Mod+Shift+E { spawn "code"; }
