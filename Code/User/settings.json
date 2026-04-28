@@ -4,7 +4,7 @@
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.detectIndentation": false,
   "editor.find.autoFindInSelection": "never",
-  "editor.fontFamily": "'Monaspace Radon NF', 'JetbrainsMono Nerd Font', 'Cascadia Mono NF'",
+  "editor.fontFamily": "'Cascadia Mono NF', 'Monaspace Radon NF', 'JetbrainsMono Nerd Font'",
   "editor.fontSize": 15,
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
@@ -12,9 +12,7 @@
   "editor.insertSpaces": true,
   "editor.minimap.enabled": false,
   "editor.renderWhitespace": "boundary",
-  "editor.rulers": [
-    80
-  ],
+  "editor.rulers": [80],
   "editor.smoothScrolling": true,
   "editor.snippetSuggestions": "bottom",
   "editor.tabCompletion": "on",
