@@ -164,6 +164,9 @@ def "main vscode config" [] {
 
 def "main fonts" [] {
   si ["cascadia-mono-nf-fonts" "cascadia-code-nf-fonts"]
+  if (has-cmd brew) {
+    brew install font-jetbrains-mono-nerd-font
+  }
 }
 
 def "main vscode" [] {
@@ -349,6 +352,7 @@ def "main opencode" [] {
 def "main desktop" [] {
   main virt
   main flatpaks
+  main brew
   main niri
 }
 
