@@ -125,8 +125,8 @@ binds {
     Mod+O { toggle-overview; }
 
     Mod+Shift+F { spawn "nautilus"; }
-    Mod+Shift+B { spawn-sh "flatpak run app.zen_browser.zen" ; }
     Mod+Shift+E { spawn "code"; }
+    Mod+Shift+B { spawn-sh "flatpak run app.zen_browser.zen" ; }
     Mod+Shift+T { spawn-sh "flatpak run org.telegram.desktop"; }
-    Mod+Shift+S { spawn-sh "flatpak run com.spotify.Client"; }
+    Mod+Shift+M { spawn-sh "flatpak run com.spotify.Client"; }
 }

@@ -1,4 +1,4 @@
-# Fedora Niri Config
+# Fedora Config
 
 ## Bootstrap
 
@@ -8,7 +8,7 @@ First install all updates.
 sudo dnf update -y
 ```
 
-Run the bootstrap script:
+Then, run the bootstrap script:
 
 ```sh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fedora-config/main/scripts/fedora-setup)"
@@ -28,10 +28,11 @@ Available commands include:
 
 ```sh
 setup.nu help
-setup.nu niri
-setup.nu flatpaks
-setup.nu virt
+setup.nu vscode
 setup.nu docker
+setup.nu virt
+setup.nu flatpaks
+setup.nu niri
 ```
 
 You could also install `homebrew` for linux.
@@ -45,4 +46,10 @@ And install packages using brew.
 ```bash
 brew install font-jetbrains-mono-nerd-font
 brew install --cask antigravity-linux
+```
+
+Install desktop application with `flatpak` from [flatpak](https://flathub.org/en))
+
+```bash
+flatpak install --user flathub com.google.Chrome
 ```
