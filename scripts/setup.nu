@@ -250,8 +250,8 @@ def "main wallpapers" [] {
 
 def "main wallpapers ml4w" [] {
   log info "Installing ML4W wallpapers"
-  mkdir ~/Pictures/Wallpapers
-  git clone --depth=1 https://github.com/mylinuxforwork/wallpaper.git ~/Pictures/Wallpapers
+  mkdir ~/.local/share/backgrounds/ml4w
+  git clone --depth=1 https://github.com/mylinuxforwork/wallpaper.git ~/.local/share/backgrounds/ml4w
 }
 
 def "main fish config" [] {
