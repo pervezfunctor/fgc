@@ -444,7 +444,7 @@ def "main niri" [] {
   main niri config
 }
 
-def "fpi" [pkgs: string[]] {
+def "fpi" [pkgs: list<string>] {
   for pkg in $pkgs {
     log info $"Installing ($pkg)"
     do -i { ^flatpak --user install -y flathub $pkg }
