@@ -19,6 +19,7 @@ fish_add_path --global --move \
     $HOME/bin \
     $HOME/.opencode/bin \
     $HOME/.local/bin \
+    $HOME/.cargo/bin \
     $HOME/.local/kitty.app/bin
 
 function has_cmd
@@ -110,4 +111,8 @@ end
 
 if test -f ~/.fedora-config/fish/local.fish
     source ~/.fedora-config/fish/local.fish
+end
+
+if test -f ~/.vite-plus/env.fish
+    source ~/.vite-plus/env.fish
 end

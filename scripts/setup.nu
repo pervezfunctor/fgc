@@ -133,6 +133,30 @@ def "main brew" [] {
   ^brew install topgrade
 }
 
+def "main rust" [] {
+  if (has-cmd rustup) { return }
+  ^curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  ^rustup default stable
+  ^rustup update
+}
+
+def "main uv" [] {
+  if (has-cmd uv) { return }
+  ^curl -LsSf https://astral.sh/uv/install.sh | sh
+}
+
+def "main vp" [] {
+  if (has-cmd vp) { return }
+  curl -fsSL https://vite.plus | bash
+  ~/.vite-plus/bin/vp install latest
+}
+
+def "main dev" [] {
+  main rust
+  main uv
+  main vp
+}
+
 def "main fonts" [] {
   si ["cascadia-mono-nf-fonts" "cascadia-code-nf-fonts"]
   if (has-cmd brew) {
@@ -283,11 +307,22 @@ def "main wm" [] {
   log info "Installing window manager packages"
   si [
     "adw-gtk3-theme"
+    "brightnessctl"
     "cups-pk-helper"
+    "ddcutil"
+    "default-fonts"
+    "default-fonts-core-emoji"
+    "distribution-gpg-keys"
+    "fastfetch"
     "fuse"
     "fuse-common"
     "fwupd"
+    "gcr"
+    "gcr"
     "gnome-keyring"
+    "gnome-keyring-pam"
+    "google-noto-color-emoji-fonts"
+    "google-noto-emoji-fonts"
     "grim"
     "gvfs"
     "gvfs-fuse"
@@ -295,14 +330,20 @@ def "main wm" [] {
     "imv"
     "kf6-kimageformats"
     "libsecret"
+    "lm_sensors"
+    "lshw"
     "mate-polkit"
     "mpv"
     "nautilus"
+    "ncurses"
     "pipewire"
     "pipewire-gstreamer"
     "pipewire-pulse"
     "pipewire-pulseaudio"
+    "playerctl"
     "qt5ct"
+    "qt6-qtimageformats"
+    "qt6-qtmultimedia"
     "qt6ct"
     "slurp"
     "tuned"
@@ -403,7 +444,14 @@ def "main niri" [] {
   main niri config
 }
 
-def "main flatpaks" [] {
+def "fpi" [pkgs: string[]] {
+  for pkg in $pkgs {
+    log info $"Installing ($pkg)"
+    do -i { ^flatpak --user install -y flathub $pkg }
+  }
+}
+
+def "main flatpak" [] {
   if not (has-cmd flatpak) {
     si ["flatpak"]
   }
@@ -413,15 +461,20 @@ def "main flatpaks" [] {
 
   let flatpaks = [
     "com.github.tchx84.Flatseal"
-    "app.zen_browser.zen"
-    "md.obsidian.Obsidian"
-    org.gnome.Papers
   ]
 
-  for pkg in $flatpaks {
-    log info $"Installing ($pkg)"
-    do -i { ^flatpak --user install -y flathub $pkg }
-  }
+  fpi $flatpaks
+}
+
+def "main apps" [] {
+  main flatpak
+  let flatpaks = [
+    "app.zen_browser.zen"
+    "md.obsidian.Obsidian"
+    "org.gnome.Papers"
+  ]
+
+  fpi $flatpaks
 }
 
 def "main virt config" [] {
@@ -486,7 +539,7 @@ def "main opencode" [] {
 
 def "main desktop" [] {
   main virt
-  main flatpaks
+  main flatpak
   main brew
   main niri
 }
@@ -520,9 +573,13 @@ let COMMANDS = {
     desc: "Install and configure Docker(from fedora repo)"
     run: {|| main docker }
   }
-  flatpaks: {
-    desc: "Install flatpak applications(zen browser, obsidian)"
-    run: {|| main flatpaks }
+  flatpak: {
+    desc: "Install and configure flatpak"
+    run: {|| main flatpak }
+  }
+  apps: {
+    desc: "Install and configure flatpak applications(zen browser, obsidian)"
+    run: {|| main apps }
   }
   brew: {
     desc: "Install Homebrew"
@@ -602,6 +659,10 @@ def "main help" [] {
   print "  wallpapers       Wallpapers from bazzite."
   print "  wallpapers ml4w  Wallpapers from ml4w github repository"
   print ""
+  print "  dev              Install development tools"
+  print "  rust             Install Rust toolchain"
+  print "  uv               Install UV toolchain"
+  print "  vp               Install Vite Plus"
 }
 
 def "main update" [] {
