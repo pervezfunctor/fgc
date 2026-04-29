@@ -1,6 +1,7 @@
 binds {
     Mod+D       { spawn-sh "dms ipc call spotlight toggle"; }
     Mod+Space   { spawn-sh "dms ipc call spotlight toggle"; }
+    Mod+Comma   { spawn-sh "dms ipc call settings toggle"; }
     Super+Alt+L { spawn-sh "dms ipc call lock lock"; }
 
     Mod+Shift+Slash { show-hotkey-overlay; }
