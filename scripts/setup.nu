@@ -124,8 +124,10 @@ def "main nvim" [] {
 
 def "main brew" [] {
   if (has-cmd brew) { return }
-  log+ "Installing brew"
+  ^sudo -v
+  log info "Installing brew"
   http get "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh" | bash
+  path add "/home/linuxbrew/.linuxbrew/bin"
 
   ^brew tap ublue-os/tap
   ^brew install topgrade
@@ -194,7 +196,7 @@ def is-shell-default [shell_path: string] {
 }
 
 def "main fish default" [] {
-  log+ "Setting fish as default shell"
+  log info "Setting fish as default shell"
   let fish_path = (which fish | get 0.path)
   if not (open /etc/shells | lines | any {|l| $l == $fish_path }) {
     $fish_path | sudo tee -a /etc/shells
@@ -224,9 +226,9 @@ fi
   }
   if not (open $rc_path | str contains $marker) {
     $snippet | save --append $rc_path
-    log+ $"Added fish auto-start to ($rc_file)"
+    log info $"Added fish auto-start to ($rc_file)"
   } else {
-    log+ $"Fish auto-start already in ($rc_file), skipping"
+    log info $"Fish auto-start already in ($rc_file), skipping"
   }
 }
 
@@ -236,6 +238,20 @@ def "main docker" [] {
     sudo systemctl enable --now docker.socket
   }
   sudo usermod -aG docker $env.USER
+  pixi global install lazydocker
+}
+
+def "main wallpapers" [] {
+  if not (has-cmd brew) {
+    main brew
+  }
+  brew install --cask bazzite-wallpapers
+}
+
+def "main wallpapers ml4w" [] {
+  log info "Installing ML4W wallpapers"
+  mkdir ~/Pictures/Wallpapers
+  git clone --depth=1 https://github.com/mylinuxforwork/wallpaper.git ~/Pictures/Wallpapers
 }
 
 def "main fish config" [] {
@@ -251,11 +267,11 @@ def "main fish" [] {
   main fish config
 }
 
-def "main kitty" [] {
-  # if not (has-cmd $"($env.HOME)/.local/kitty.app/bin/kitty") {
-  #   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-  # }
+def "main kitty latest" [] {
+  curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+}
 
+def "main kitty" [] {
   si ["kitty"]
   main stow "kitty"
 }
@@ -300,7 +316,6 @@ def wm-install [] {
 
   let pictures = ($env.HOME | path join "Pictures")
   do -i { mkdir $"($pictures)/Screenshots" }
-  do -i { mkdir $"($pictures)/Wallpapers" }
 
   main stow "xdg-desktop-portal"
 }
@@ -530,6 +545,8 @@ def "main help" [] {
   print "  virt config      Configure libvirt"
   print "  kitty            Install and Configure Kitty terminal"
   print "  fish             Install and configure fish shell"
+  print "  wallpapers       Wallpapers from bazzite."
+  print "  wallpapers ml4w  Wallpapers from ml4w github repository"
   print ""
 }
 
