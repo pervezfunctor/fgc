@@ -360,7 +360,7 @@ def "main greetd keyring fix" [] {
   print $"Backup written to ($backup)"
 }
 
-def "main greeter" [] {
+def "main greetd" [] {
   if not (has-cmd dms) {
       log error "dms is not installed. Cannot setup greetd."
       return
@@ -589,6 +589,7 @@ def "main help" [] {
   print "Commands:"
   print "  help             Show this help message"
   print "  desktop          Configure desktop environment(niri, virt, brew, apps)"
+  print "  greetd           Configure greetd greeter"
   print "  stow <package>   Symlink a config package into ~/.config"
 
   commands | each {|row| print $"  ($row.name | fill -w 16) ($row.value.desc)" }
