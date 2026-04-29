@@ -104,6 +104,13 @@ def --env bootstrap [] {
   }
 }
 
+def "main nix" [] {
+  if (has-cmd nix) { return }
+
+  sudo dnf install nix nix-daemon
+  sudo systemctl enable --now nix-daemon
+}
+
 def "main nvim install" [] {
   pixi global install nvim lazyygit tree-sitter-cli luarocks
   main fonts
@@ -662,6 +669,7 @@ def "main help" [] {
   print "  dev              Install development tools"
   print "  rust             Install Rust toolchain"
   print "  uv               Install UV toolchain"
+  print "  nix              Install Nix package manager"
   print "  vp               Install Vite Plus"
 }
 
