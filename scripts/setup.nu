@@ -276,7 +276,7 @@ def "main kitty" [] {
   main stow "kitty"
 }
 
-def wm-install [] {
+def "main wm" [] {
   main fonts
   main kitty
 
@@ -284,22 +284,28 @@ def wm-install [] {
   si [
     "adw-gtk3-theme"
     "cups-pk-helper"
-    "gvfs"
+    "fuse"
+    "fuse-common"
+    "fwupd"
     "gnome-keyring"
     "grim"
+    "gvfs"
     "gvfs-fuse"
     "gvfs-smb"
     "imv"
+    "kf6-kimageformats"
     "libsecret"
     "mate-polkit"
     "mpv"
     "nautilus"
     "pipewire"
+    "pipewire-gstreamer"
     "pipewire-pulse"
     "pipewire-pulseaudio"
     "qt5ct"
     "qt6ct"
     "slurp"
+    "tuned"
     "udiskie"
     "udisks2"
     "wireplumber"
@@ -321,7 +327,7 @@ def wm-install [] {
 }
 
 def "main niri install" [] {
-  wm-install
+  main wm
 
   if (has-cmd dms) and (has-cmd niri) {
     log info "niri and dms are already installed"
@@ -333,6 +339,7 @@ def "main niri install" [] {
   ^sudo dnf copr enable -y yalter/niri
   si ["niri" "dms" "cliphist" "dms-greeter"]
   dms greeter enable
+  dms greeter sync
 }
 
 def "main niri config" [] {
