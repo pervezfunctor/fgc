@@ -360,6 +360,20 @@ def "main greetd keyring fix" [] {
   print $"Backup written to ($backup)"
 }
 
+def "main greeter" [] {
+  if not (has-cmd dms) {
+      log error "dms is not installed. Cannot setup greetd."
+      return
+  }
+
+  log info "Installing greeter"
+  si ["dms-greeter"]
+  dms greeter enable
+  dms greeter sync
+
+  main greetd keyring fix
+}
+
 def "main niri install" [] {
   main wm
 
@@ -371,9 +385,7 @@ def "main niri install" [] {
   log info "Installing niri and dms"
   ^sudo dnf copr enable -y avengemedia/dms
   ^sudo dnf copr enable -y yalter/niri
-  si ["niri" "dms" "cliphist" "dms-greeter"]
-  dms greeter enable
-  dms greeter sync
+  si ["niri" "dms" "cliphist"]
 }
 
 def "main niri config" [] {
