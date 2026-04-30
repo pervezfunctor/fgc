@@ -138,6 +138,6 @@ binds {
         spawn-sh "FISH_SIMPLE=1 kitty --class scratch-terminal";
     }
     Mod+Ctrl+Shift+Space {
-        spawn-sh "niri msg action focus-workspace 2 && ~/linux-config/nu/open-terminals.nu";
+        spawn-sh "niri msg action focus-workspace 2 && ~/.fedora-config/scripts/kitty-ai.nu";
     }
 }
