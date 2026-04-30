@@ -127,5 +127,5 @@ end
 alias gh-refresh 'gh auth refresh -h github.com'
 
 if has_cmd nix
-  alias hms 'nix run home-manager -- switch --flake ~/.fedora-config/home-manager#"$USER" --impure'
+  alias hms 'nix run home-manager -- switch --flake ~/.fedora-config/home-manager#$USER --impure'
 end
