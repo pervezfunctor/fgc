@@ -516,7 +516,7 @@ def "main virt install" [] {
     "libvirt-nss"
     "qemu-img"
     "qemu-tools"
-    "libisoinfo"
+    "libosinfo"
     "osinfo-db"
     "osinfo-db-tools"
     "libguestfs-tools"
