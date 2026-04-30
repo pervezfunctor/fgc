@@ -1,19 +1,30 @@
 { pkgs, vars, ... }:
 {
+
+  nixpkgs.config.allowUnfree = true;
+  fonts.fontconfig.enable = true;
+
   home = {
     username = vars.username;
     homeDirectory = vars.homeDirectory;
     stateVersion = "25.11";
+
     packages = with pkgs; [
       devbox
       devenv
       nil
       nixd
       nixfmt
+      # bibata-cursors
+      # nerd-fonts.monaspace
+      # nerd-fonts.jetbrains-mono
     ];
   };
-  nixpkgs.config.allowUnfree = true;
-  fonts.fontconfig.enable = true;
+
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
 
   nix = {
     package = pkgs.nix;
