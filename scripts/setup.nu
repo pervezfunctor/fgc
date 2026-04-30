@@ -629,14 +629,12 @@ def run-command [cmd: string] {
   do $action.run
 }
 
-const DEFAULT_INSTALL = []
+def gum-select-install [options: list<string>, default_installs: list<string> = []] {
 
-def gum-select-install [] {
   if not (has-cmd gum) {
     die "gum is required for interactive selection"
   }
-
-  let defaults = ($DEFAULT_INSTALL | str join ",")
+  let defaults = ($default_installs | str join ",")
 
   options
   | str join "\n"
@@ -714,5 +712,5 @@ def "main default" [] {
 
 def main [] {
   main default
-  gum-select-install
+  gum-select-install (options)
 }
