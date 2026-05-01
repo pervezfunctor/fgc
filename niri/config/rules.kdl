@@ -106,6 +106,7 @@ window-rule {
 
 window-rule {
     match app-id="scratch-terminal"
+    match app-id="quick-access-terminal"
     open-floating true
     open-maximized false
     open-fullscreen false

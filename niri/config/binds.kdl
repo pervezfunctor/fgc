@@ -134,8 +134,12 @@ binds {
     Mod+Shift+B { spawn-sh "flatpak run app.zen_browser.zen" ; }
     Mod+Shift+T { spawn-sh "flatpak run org.telegram.desktop"; }
     Mod+Shift+M { spawn-sh "flatpak run com.spotify.Client"; }
-    Mod+Shift+Return {
+
+    Mod+Shift+Ctrl+Return {
         spawn-sh "FISH_SIMPLE=1 kitty --class scratch-terminal";
+    }
+    Mod+Shift+Return {
+        spawn-sh "kitten quick-access-terminal --config ~/.fedora-config/extras/quick_access_terminal.conf";
     }
     Mod+Ctrl+Shift+Space {
         spawn-sh "niri msg action focus-workspace 2 && ~/.fedora-config/scripts/kitty-ai.nu";
