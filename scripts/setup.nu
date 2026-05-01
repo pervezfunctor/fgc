@@ -531,7 +531,7 @@ def "main virt install" [] {
 }
 
 def "main virt" [] {
-  si ["distrobox"]
+  si ["podman" "distrobox"]
   main virt install
   main virt config
 }
