@@ -56,11 +56,6 @@ window-rule {
 }
 
 window-rule {
-    match app-id="^(kitty.*)$"
-    default-column-width { proportion 0.333; }
-}
-
-window-rule {
     match app-id="^(virt-manager.*)$"
     open-floating true
 }
@@ -81,8 +76,8 @@ window-rule {
 }
 
 window-rule {
-    match app-id="^kitty$"
-
+    match app-id="^(kitty.*)$"
+    default-column-width { proportion 0.333; }
     background-effect {
         blur true
     }
