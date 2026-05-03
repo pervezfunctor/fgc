@@ -56,9 +56,13 @@ warn() {
   printf "WARNING: %s\n" "$*" >>"${LOG_FILE}"
 }
 
-die() {
+error() {
   printf "\033[1;31m✖\033[0m %s\n" "$*" >&2
   printf "ERROR: %s\n" "$*" >>"${LOG_FILE}"
+}
+
+die() {
+  error "$*"
   exit 1
 }
 
@@ -100,12 +104,15 @@ dotfiles_install() {
   fi
 }
 
+COMMON_PACKAGES=(
+  bat direnv duf eza fd fzf gdu gh jq ripgrep tealdeer trash-cli
+  zoxide difftastic less htop shellcheck shfmt rsync rclone fish
+)
+
 system_install() {
   sudo dnf update -y || die "Failed to update packages"
 
-  sudo dnf install -y git fish gcc pipx libatomic make plocate tar tmux \
-    zstd bat direnv duf eza fd fzf gdu gh jq ripgrep tealdeer trash-cli \
-    zoxide difftastic less htop gum cmake unzip shellcheck shfmt rsync
+  sudo dnf install -y git gcc unzip pipx libatomic make plocate tar tmux zstd "${COMMON_PACKAGES[@]}"
 
   tldr --update || true
   sudo updatedb || true
@@ -122,7 +129,7 @@ pixi_install() {
 
 pixi_packages_install() {
   pixi global install carapace nushell xh television starship bottom
-  has_cmd fish || pixi global install fish
+  has_cmd rpm-ostree && pixi global install "${COMMON_PACKAGES[@]}"
 }
 
 link() {
@@ -130,12 +137,12 @@ link() {
   source="$(realpath "$1")"
 
   if [ ! -e "$source" ]; then
-    warn "Skipping: $source does not exist"
+    error "Skipping: $source does not exist"
     return 1
   fi
 
   if [[ "$source" != "$DOT_DIR"/* ]]; then
-    warn "Skipping: $source is outside $DOT_DIR"
+    error "Skipping: $source is outside $DOT_DIR"
     return 1
   fi
 
@@ -144,12 +151,17 @@ link() {
   mkdir -p "$dir"
 
   if [ -d "$target" ] && [ ! -L "$target" ]; then
-    warn "Skipping: $target is a directory"
+    error "Skipping: $target is a directory"
     return 1
   fi
 
+  if [ -L "$target" ] && [ "$(readlink -f "$target")" = "$source" ]; then
+    log "Skipping: $target already links to $source"
+    return 0
+  fi
+
   if [ -e "$target" ] || [ -L "$target" ]; then
-    log "Trashing existing $target (restore with 'trash-restore')..."
+    warn "Trashing existing $target (restore with 'trash-restore')..."
     trash "$target"
   fi
 
@@ -157,7 +169,7 @@ link() {
   ln -s "$source" "$target"
 }
 
-set_fish_default() {
+set_fish_as_default_shell() {
   has_cmd fish || die "fish not found. Quitting."
 
   local fish_path current_shell
@@ -170,9 +182,9 @@ set_fish_default() {
   fi
 
   if ! grep -qxF "$fish_path" /etc/shells 2>/dev/null; then
-    log "Adding $fish_path to /etc/shells."
+    warn "Adding $fish_path to /etc/shells."
     if ! echo "$fish_path" | sudo tee -a /etc/shells >/dev/null; then
-      warn "Failed to add $fish_path to /etc/shells."
+      error "Failed to add $fish_path to /etc/shells."
       return
     fi
   else
@@ -182,7 +194,7 @@ set_fish_default() {
   if chsh -s "$fish_path"; then
     log "Default shell set to fish ($fish_path). Re-login to apply."
   else
-    warn "Failed to set fish as default shell."
+    error "Failed to set fish as default shell. Try running 'chsh -s $fish_path' manually."
   fi
 }
 
@@ -190,10 +202,10 @@ fish_config() {
   has_cmd fish || die "fish not installed. Quitting."
 
   if ! link "${DOT_DIR}/fish/config.fish" "${HOME}/.config/fish/config.fish"; then
-    warn "Failed to link fish config"
+    error "Failed to link fish config"
   fi
 
-  set_fish_default
+  set_fish_as_default_shell
 }
 
 fresh_install() {
@@ -203,19 +215,15 @@ fresh_install() {
   pixi_packages_install
   fish_config
 
-  has_cmd nu || die "nu is not installed. Quitting."
+  if ! has_cmd nu; then
+    log "nu is not installed. Skipping."
+    return
+  fi
 
   echo ""
   log "Shell configuration complete."
   log "Use ~/.fedora-config/scripts/setup.nu for further setup."
   echo ""
-}
-
-has_commands() {
-  for cmd in "$@"; do
-    has_cmd "$cmd" || return 1
-  done
-  return 0
 }
 
 main() {
