@@ -116,11 +116,11 @@ binds {
     Mod+C { center-column; }
     Mod+O { toggle-overview; }
 
-    Mod+Minus { set-column-width "-10%"; }
-    Mod+Equal { set-column-width "+10%"; }
+    Mod+Minus { set-column-width "-5%"; }
+    Mod+Equal { set-column-width "+5%"; }
 
-    Mod+Shift+Minus { set-window-height "-10%"; }
-    Mod+Shift+Equal { set-window-height "+10%"; }
+    Mod+Shift+Minus { set-window-height "-5%"; }
+    Mod+Shift+Equal { set-window-height "+5%"; }
 
     Mod+BackSlash       { toggle-window-floating; }
     Mod+Shift+BackSlash { switch-focus-between-floating-and-tiling; }
