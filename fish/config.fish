@@ -67,10 +67,6 @@ if has_cmd eza
     alias ls  'eza --icons --group-directories-first'
 end
 
-if has_cmd bat
-    alias cat 'bat'
-end
-
 if has_cmd uvx
     alias uv-marimo-standalone 'uvx --with pyzmq --from "marimo[sandbox]" marimo edit --sandbox'
 end
