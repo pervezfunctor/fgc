@@ -15,16 +15,78 @@
       nil
       nixd
       nixfmt
-      # bibata-cursors
-      # nerd-fonts.monaspace
-      # nerd-fonts.jetbrains-mono
+      carapace
+      dysk
+      bottom
+      nushell
+      starship
+      television
+      xh
+      bibata-cursors
+      nerd-fonts.monaspace
+      nerd-fonts.jetbrains-mono
+
+      eza
+      direnv
+      fzf
+      zoxide
     ];
   };
 
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
+  programs = {
+    home-manager.enable = true;
+
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+
+    nushell = {
+      enable = true;
+      plugins = [ pkgs.nushellPlugins.formats ];
+      settings = {
+        show_banner = false;
+      };
+    };
   };
+
+  #   fish = {
+  #     enable = true;
+  #   };
+
+  #   eza = {
+  #     enable = true;
+  #     enableFishIntegration = true;
+  #     enableNushellIntegration = true;
+  #   };
+
+  #   starship = {
+  #     enable = true;
+  #     enableFishIntegration = true;
+  #     enableZshIntegration = true;
+  #     enableNushellIntegration = true;
+  #   };
+
+  #   carapace = {
+  #     enable = true;
+  #     enableFishIntegration = true;
+  #     enableNushellIntegration = true;
+  #   };
+
+  #   fzf = {
+  #     enable = true;
+  #     enableFishIntegration = true;
+  #   };
+
+  #   zoxide = {
+  #     enable = true;
+  #     enableFishIntegration = true;
+  #     enableNushellIntegration = true;
+  #   };
+
+  # };
 
   nix = {
     package = pkgs.nix;

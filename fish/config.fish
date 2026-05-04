@@ -15,7 +15,6 @@ fish_add_path --global --move \
     $HOME/.local/share/flatpak/exports/bin \
     $DOT_DIR/scripts \
     /home/linuxbrew/.linuxbrew/bin \
-    $HOME/.pixi/bin \
     $HOME/bin \
     $HOME/.opencode/bin \
     $HOME/.local/bin \
@@ -133,4 +132,12 @@ end
 
 if has_cmd fastfetch
     fastfetch
+end
+
+function dir_exists
+    test -d "$1"
+end
+
+if has_cmd distrobox
+    alias dt 'distrobox'
 end

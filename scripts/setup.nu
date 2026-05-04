@@ -147,15 +147,6 @@ def touch-files [dir: string, files: list<string>] {
   }
 }
 
-def "main pixi" [] {
-  if not (has-cmd pixi) {
-    log info "Installing pixi."
-    curl -fsSL https://pixi.sh/install.sh | sh
-  } else {
-    log info "pixi is already installed, skipping"
-  }
-}
-
 def set-fish-as-default-shell [] {
   if not (has-cmd fish) { die "fish not found. Quitting." }
 
@@ -198,55 +189,48 @@ def set-fish-as-default-shell [] {
   }
 }
 
-def "main shell" [] {
-  main pixi
+def "main fish" [] {
+  si ["fish"]
+  set-fish-as-default-shell
+  main stow fish
+}
 
-  let common_packages = [
+def "main shell" [] {
+  si [
     "bat"
     "difftastic"
-    "direnv"
     "duf"
-    "eza"
     "fd"
-    "fish"
-    "fzf"
+    "gcc"
     "gdu"
     "gh"
+    "git"
     "htop"
     "jq"
+    "less"
+    "libatomic"
+    "make"
+    "pipx"
+    "plocate"
     "rclone"
     "ripgrep"
     "rsync"
     "shellcheck"
     "shfmt"
+    "tar"
     "tealdeer"
+    "tmux"
     "trash-cli"
     "ugrep"
+    "unzip"
     "yq"
-    "zoxide"
+    "zstd"
   ]
-  let pixi_packages = [
-    "carapace"
-    "dysk"
-    "bottom"
-    "nushell"
-    "starship"
-    "television"
-    "xh"
-  ]
-
-  if not (is-atomic) {
-    sudo dnf install -y git gcc less unzip pipx libatomic make plocate tar tmux zstd ...$common_packages
-    pixi global install ...$pixi_packages
-    do -i { sudo updatedb }
-  } else {
-    pixi global install ...$common_packages ...$pixi_packages
-  }
 
   do -i { tldr --update }
+  do -i { sudo updatedb }
 
-  set-fish-as-default-shell
-  main stow fish
+  main fish
 }
 
 def --env bootstrap [] {
@@ -255,37 +239,10 @@ def --env bootstrap [] {
 
   for p in [
     "bin"
-    ".pixi/bin"
     ".local/bin"
-    ".opencode/bin"
   ] {
     path add ($env.HOME | path join $p)
   }
-}
-
-def "main nix" [] {
-  if (has-cmd nix) { return }
-
-  sudo dnf install nix nix-daemon
-  sudo systemctl enable --now nix-daemon
-}
-
-def "main nvim install" [] {
-  pixi global install nvim lazyygit tree-sitter-cli luarocks
-  main fonts
-
-  nvim
-}
-
-def "main nvim config" [] {
-  ^trash ~/.config/nvim
-  ^git clone --depth 1 https://github.com/AstroNvim/template ~/.config/nvim
-  ^trash ~/.config/nvim/.git
-}
-
-def "main nvim" [] {
-  main nvim install
-  main nvim config
 }
 
 def "main brew" [] {
@@ -385,21 +342,13 @@ def "main vscode" [] {
 
 def "main docker" [] {
   if not (has-cmd docker) {
-    sudo dnf install -y docker docker-compose
+    si ["docker" "docker-compose"]
     sudo systemctl enable --now docker.socket
   }
   sudo usermod -aG docker $env.USER
-  pixi global install lazydocker
 }
 
 def "main wallpapers" [] {
-  if not (has-cmd brew) {
-    main brew
-  }
-  brew install --cask bazzite-wallpapers
-}
-
-def "main wallpapers ml4w" [] {
   let base = $"$($env.HOME)/.local/share/backgrounds"
   let dir = $"($base)/ml4w"
   if (dir-exists $dir) {
@@ -650,14 +599,29 @@ def "main virt" [] {
   main virt config
 }
 
-def "main opencode" [] {
-  if (has-cmd opencode) {
-    log info "opencode is already installed"
-    return
+def "main incus" [] {
+  log info "Installing incus"
+  si ["incus" "incus-tools"]
+
+  log info "Adding user to incus groups"
+  do -i {
+    sudo usermod -aG incus $env.USER
+    sudo usermod -aG incus-admin $env.USER
   }
 
-  log info "Installing opencode"
-  ^curl -fsSL https://opencode.ai/install | bash
+  log info "Enabling incus socket"
+  do -i { sudo systemctl enable --now incus.socket }
+
+  log info "Configuring firewalld for incus"
+  do -i {
+    sudo firewall-cmd --zone=trusted --change-interface=incusbr0 --permanent
+    sudo firewall-cmd --reload
+  }
+
+  log info "Initializing incus admin"
+  do -i { sg incus-admin -- incus admin init --minimal }
+
+  log info "Incus configured. Reboot your system and use incus.nu script."
 }
 
 def "main desktop" [] {
@@ -679,10 +643,24 @@ def "main zed" [] {
   main stow "zed"
 }
 
+def "main home-manager" [] {
+  log info "Installing home-manager"
+  if not (has-cmd nix) {
+    log error "Nix is not installed. Please install it first."
+    return
+  }
+
+  nix run home-manager -- switch --flake "$($env.HOME)/.fedora-config/home-manager#($env.USER)" --impure
+}
+
 let ALL_COMMANDS = {
   "shell": {
     desc: "Install shell tools and set Fish as default shell"
     run: {|| main shell }
+  }
+  "home-manager": {
+    desc: "Install and configure home-manager"
+    run: {|| main home-manager }
   }
   niri: {
     desc: "Install and configure niri WM"
@@ -716,10 +694,6 @@ let ALL_COMMANDS = {
     desc: "Install and configure Zed editor"
     run: {|| main zed }
   }
-  nvim: {
-    desc: "Install and configure(Astro) Neovim"
-    run: {|| main nvim }
-  }
   "rust": {
     desc: "Install and configure Rust toolchain"
     run: {|| main rust }
@@ -732,13 +706,9 @@ let ALL_COMMANDS = {
     desc: "Install and configure Vite Plus(Node)"
     run: {|| main vp }
   }
-  "nix": {
-    desc: "Install and configure Nix"
-    run: {|| main nix }
-  }
-  "opencode": {
-    desc: "Install and configure OpenCode"
-    run: {|| main opencode }
+  "home-manager": {
+    desc: "Install and configure Home Manager"
+    run: {|| main home-manager }
   }
   "kitty": {
     desc: "Install and configure Kitty terminal"
@@ -747,7 +717,7 @@ let ALL_COMMANDS = {
 }
 
 let ATOMIC_COMMANDS = ($ALL_COMMANDS |
-  select  "kitty" "shell" "fish" "flatpak" "apps" "zed" "nvim" "rust" "uv" "vp" "opencode")
+  select  "kitty" "shell" "fish" "flatpak" "apps" "zed" "rust" "uv" "vp" "opencode")
 
 let COMMANDS = if (is-atomic) {
   $ATOMIC_COMMANDS
@@ -764,7 +734,7 @@ def run-command [cmd: string] {
   do ($COMMANDS | get $key).run
 }
 
-def nu-select-install [] {
+def multi-select-installer [] {
   $COMMANDS | columns
   | input list --multi
   | each {|cmd| run-command ($cmd | str trim) }
@@ -780,18 +750,17 @@ def "main help" [] {
   print "Commands:"
   print "  help             Show this help message"
   print "  desktop          Configure desktop environment(niri, virt, brew, apps)"
-  print "  greetd           Configure greetd greeter"
+  print "  greetd           Configure greetd greeter(disables SDDM/GDM)"
   print "  stow-config <pkg> Symlink a config package into ~/.config/<pkg>"
   print "  stow-home <pkg>  Symlink a package into ~ (use 'dot-' prefix for dotfiles)"
 
   $COMMANDS | transpose name value | each {|row| print $"  ($row.name | fill -w 16) ($row.value.desc)" }
 
   print ""
-  print "  opencode         Install opencode(AI)"
   print "  virt config      Configure libvirt"
   print "  kitty            Install and Configure Kitty terminal"
-  print "  wallpapers       Wallpapers from bazzite."
-  print "  wallpapers ml4w  Wallpapers from ml4w github repository"
+  print "  wallpapers       Wallpapers from Ml4w github repository"
+
   print ""
   print "  dev              Install development tools"
   print "  rust             Install Rust toolchain"
@@ -805,7 +774,6 @@ def "main update" [] {
   ^sudo dnf update -y
 }
 
-
 def check-commands [...cmds: string]: nothing -> bool {
   mut result = true
   for cmd in $cmds {
@@ -817,8 +785,8 @@ def check-commands [...cmds: string]: nothing -> bool {
   $result
 }
 
-def checks [] {
-  if not (check-commands "trash" "git" "pixi") {
+def prerequisites [] {
+  if not (check-commands "trash" "git" "nix") {
     die "Required commands not available. Quitting."
   }
 
@@ -828,12 +796,12 @@ def checks [] {
 }
 
 def "main default" [] {
-  checks
+  prerequisites
   bootstrap
   main update
 }
 
 def main [] {
   main default
-  nu-select-install
+  multi-select-installer
 }

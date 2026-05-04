@@ -14,7 +14,7 @@ Run the following bootstrap script
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fedora-config/main/scripts/fedora-setup)"
 ```
 
-This script clones this repo to `~/.fedora-config`, installs pixi and installs fish as your default shell.
+This script clones this repo to `~/.fedora-config`, installs nix and installs fish as your default shell.
 
 Reboot your computer and open terminal. You should be in fish shell.
 
@@ -43,27 +43,13 @@ setup.nu flatpak
 flatpak install --user flathub com.google.Chrome
 ```
 
-Shell tools not available in official fedora repositories, might be available with `pixi`.
+Shell tools not available in official fedora repositories, should be available with `nix`.
 
 ```sh
-pixi global install lazydocker
+setup.nu home-manager
 ```
 
-If even pixi does not have the package you need, use brew.
-
-```sh
-setup.nu brew
-brew install font-jetbrains-mono-nerd-font
-brew install --cask antigravity-linux
-```
-
-If you prefer nix
-
-```sh
-setup.nu nix
-```
-
-and then setup home-manager
+Now add your packages to `home.pacakges` in `~/.fedora-config/home-manager/home.nix`. Then run
 
 ```sh
 hms

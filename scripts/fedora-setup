@@ -22,37 +22,23 @@ has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
 
-pixi_install() {
-  has_cmd pixi || {
-    has_cmd curl || die "curl is not installed. Quitting."
+main() {
+  has_cmd dnf || die "Only Fedora is supported. Quitting."
 
-    log "Installing pixi."
-    curl -fsSL https://pixi.sh/install.sh | sh
-  }
-
-  has_cmd pixi || die "Failed to install pixi"
-  pixi global install nushell
-}
-
-fresh_install() {
-  [ -d "$DOT_DIR" ] || die "$DOT_DIR does not exist. Quitting."
-  pixi_install
-
-  if ! has_cmd nu; then
-    log "nu is not installed. Skipping."
-    return
+  if [ ! -d "$DOT_DIR" ]; then
+    git clone https://github.com/pervezfunctor/fedora-config "$DOT_DIR" || die "git clone failed"
   fi
 
-  "$DOT_DIR"/scripts/setup.nu shell || die "shell/fish setup failed"
+  sudo dnf update -y
+  sudo dnf install -y nix nix-daemon
+  sudo systemctl enable --now nix-daemon
+
+  has_cmd nix || die "nix is not installed. Quitting."
+
+  nix run nixpkgs#nu -- "$DOT_DIR"/scripts/setup.nu shell || die "shell/fish setup failed"
 
   echo ""
   log "Shell configuration complete."
-  log "Use ~/.fedora-config/scripts/setup.nu for further setup."
+  log "Use nix run nixpkgs#nu -- ~/.fedora-config/scripts/setup.nu for further setup."
   echo ""
-}
-
-main() {
-  has_cmd dnf || die "Only Fedora is supported. Quitting."
-  export PATH="$HOME/.pixi/bin:$PATH"
-  fresh_install
 }
