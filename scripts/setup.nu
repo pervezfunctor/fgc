@@ -658,10 +658,6 @@ let ALL_COMMANDS = {
     desc: "Install shell tools and set Fish as default shell"
     run: {|| main shell }
   }
-  "home-manager": {
-    desc: "Install and configure home-manager"
-    run: {|| main home-manager }
-  }
   niri: {
     desc: "Install and configure niri WM"
     run: {|| main niri }
