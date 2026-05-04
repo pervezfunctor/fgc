@@ -45,7 +45,7 @@ main() {
   log "Installing packages..."
   sudo zypper install -y nushell bat difftastic duf fd gdu gh git \
     htop jq less rclone ripgrep rsync ShellCheck shfmt tar tealdeer \
-    tmux trash-cli ugrep unzip yq zstd dysk bottom starship xh
+    tmux trash-cli ugrep unzip yq zstd dysk bottom starship xh fish
 
   log "Setting up fish shell..."
   mkdir -p ~/.config/fish
@@ -57,7 +57,7 @@ main() {
   ln -sf "$DOT_DIR"/config.fish ~/.config/fish/config.fish
   log "Setting fish as default shell..."
   if ! chsh -s /usr/bin/fish; then
-    log "Failed to set fish as default shell. You may need to run 'sudo chsh -s /usr/bin/fish' manually."
+    log "Failed to set fish as default shell. You may need to run 'sudo chsh -s $(which fish) $USER' manually."
   else
     log "Fish set as default shell successfully."
   fi
