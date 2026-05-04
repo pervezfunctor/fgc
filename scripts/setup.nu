@@ -42,27 +42,80 @@ def is-fedora []: nothing -> bool {
   $content =~ "fedora"
 }
 
-def sln [src: string, dst: string] {
-  if not (($src | path exists) and (($src | path type) != "dir")) {
-    log error $"($src) does not exist or is a directory. Skipping linking."
-    return
+def link [source: string, target: string]: nothing -> bool {
+  let src = ($source | path expand)
+
+  if not ($src | path exists) {
+    log error $"Skipping: ($src) does not exist"
+    return false
   }
 
-  do -i { ^trash $dst e> /dev/null }
-  log info $"linking ($src) -> ($dst)"
-  ^ln -sf $src $dst
+  if not ($src | str starts-with $"($env.DOT_DIR)/") {
+    log error $"Skipping: ($src) is outside ($env.DOT_DIR)"
+    return false
+  }
+
+  let dir = ($target | path dirname)
+  if not ($dir | path exists) {
+    mkdir $dir
+  }
+
+  let is_symlink = (do -i { ^readlink $target } | is-not-empty)
+
+  if ($target | path exists) and (($target | path type) == "dir") and not $is_symlink {
+    log error $"Skipping: ($target) is a directory"
+    return false
+  }
+
+  if $is_symlink {
+    let resolved = do -i { ^readlink -f $target }
+    if ($resolved | is-not-empty) and ($resolved | str trim) == $src {
+      log info $"Skipping: ($target) already links to ($src)"
+      return true
+    }
+  }
+
+  if ($target | path exists) or $is_symlink {
+    log warning $"Trashing existing ($target) (restore with 'trash-restore')"
+    do -i { ^trash $target }
+  }
+
+  log info $"Linking ($src) -> ($target)"
+  ^ln -s $src $target
+  true
 }
 
-def "main stow" [package: string] {
-  let root = (($env.DOT_DIR | path join $package) | path expand)
+def dotify-path [p: string]: nothing -> string {
+  $p | path split | each {|seg|
+    if ($seg | str starts-with "dot-") {
+      $".($seg | str substring 4..)"
+    } else {
+      $seg
+    }
+  } | path join
+}
+
+def link-all [source: string, target: string] {
+  let root = ($source | path expand)
 
   for f in (glob $"($root)/**/*" --no-dir) {
     let src = ($f | path expand)
     let rel = ($src | path relative-to $root)
-    let dst = ($env.HOME | path join ".config" $package $rel)
-    ensure-parent-dir $dst
-    sln $src $dst
+    let dst = ($target | path join (dotify-path $rel))
+    link $src $dst
   }
+}
+
+def "main stow config" [package: string] {
+  link-all ($env.DOT_DIR | path join $package) ($env.HOME | path join ".config" $package)
+}
+
+def "main stow" [package: string] {
+  main stow $package
+}
+
+def "main stow home" [package: string] {
+  link-all ($env.DOT_DIR | path join $package) $env.HOME
 }
 
 def group-add [group: string] {
@@ -92,6 +145,108 @@ def touch-files [dir: string, files: list<string>] {
       touch $file_path
     }
   }
+}
+
+def "main pixi" [] {
+  if not (has-cmd pixi) {
+    log info "Installing pixi."
+    curl -fsSL https://pixi.sh/install.sh | sh
+  } else {
+    log info "pixi is already installed, skipping"
+  }
+}
+
+def set-fish-as-default-shell [] {
+  if not (has-cmd fish) { die "fish not found. Quitting." }
+
+  let fish_path = (which fish | first | get path)
+  let current_shell = (
+    ^getent passwd $env.USER
+    | parse "{name}:{password}:{uid}:{gid}:{gecos}:{home}:{shell}"
+    | get shell.0
+    | str trim
+  )
+
+  if $current_shell == $fish_path {
+    log info "fish is already the default shell."
+    return
+  }
+
+  let etc_shells = "/etc/shells"
+  let in_shells = if ($etc_shells | path exists) {
+    open $etc_shells | lines | any {|l| $l == $fish_path }
+  } else {
+    false
+  }
+
+  if $in_shells {
+    log info $"($fish_path) is already in /etc/shells."
+  } else {
+    log warning $"Adding ($fish_path) to /etc/shells."
+    let tee = ($fish_path | ^sudo tee -a $etc_shells | complete)
+    if $tee.exit_code != 0 {
+      log error $"Failed to add ($fish_path) to /etc/shells."
+      return
+    }
+  }
+
+  let chsh = (^chsh -s $fish_path | complete)
+  if $chsh.exit_code == 0 {
+    log info $"Default shell set to fish \(($fish_path)\). Re-login to apply."
+  } else {
+    log error $"Failed to set fish as default shell. Try running 'chsh -s ($fish_path)' manually."
+  }
+}
+
+def "main shell" [] {
+  main pixi
+
+  let common_packages = [
+    "bat"
+    "difftastic"
+    "direnv"
+    "duf"
+    "eza"
+    "fd"
+    "fish"
+    "fzf"
+    "gdu"
+    "gh"
+    "htop"
+    "jq"
+    "rclone"
+    "ripgrep"
+    "rsync"
+    "shellcheck"
+    "shfmt"
+    "tealdeer"
+    "trash-cli"
+    "ugrep"
+    "yq"
+    "zoxide"
+  ]
+  let pixi_packages = [
+    "carapace"
+    "dysk"
+    "bottom"
+    "nushell"
+    "starship"
+    "television"
+    "xh"
+  ]
+
+  if not (is-atomic) {
+    sudo dnf install -y git gcc less unzip pipx libatomic make plocate tar tmux zstd ...$common_packages
+    pixi global install ...$pixi_packages
+    do -i { sudo updatedb }
+  } else {
+    pixi global install ...$common_packages ...$pixi_packages
+  }
+
+  do -i { tldr --update }
+
+  set-fish-as-default-shell
+  main stow fish
 }
 
 def --env bootstrap [] {
@@ -525,6 +680,10 @@ def "main zed" [] {
 }
 
 let ALL_COMMANDS = {
+  "shell": {
+    desc: "Install shell tools and set Fish as default shell"
+    run: {|| main shell }
+  }
   niri: {
     desc: "Install and configure niri WM"
     run: {|| main niri }
@@ -581,10 +740,17 @@ let ALL_COMMANDS = {
     desc: "Install and configure OpenCode"
     run: {|| main opencode }
   }
+  "kitty": {
+    desc: "Install and configure Kitty terminal"
+    run: {|| main kitty }
+  }
 }
 
+let ATOMIC_COMMANDS = ($ALL_COMMANDS |
+  select  "kitty" "shell" "fish" "flatpak" "apps" "zed" "nvim" "rust" "uv" "vp" "opencode")
+
 let COMMANDS = if (is-atomic) {
-  $ALL_COMMANDS | select "flatpak" "apps" "zed" "nvim" "rust" "uv" "vp" "opencode" "kitty"
+  $ATOMIC_COMMANDS
 } else {
   $ALL_COMMANDS
 }
@@ -615,7 +781,8 @@ def "main help" [] {
   print "  help             Show this help message"
   print "  desktop          Configure desktop environment(niri, virt, brew, apps)"
   print "  greetd           Configure greetd greeter"
-  print "  stow <package>   Symlink a config package into ~/.config"
+  print "  stow-config <pkg> Symlink a config package into ~/.config/<pkg>"
+  print "  stow-home <pkg>  Symlink a package into ~ (use 'dot-' prefix for dotfiles)"
 
   $COMMANDS | transpose name value | each {|row| print $"  ($row.name | fill -w 16) ($row.value.desc)" }
 
