@@ -76,7 +76,7 @@ def link [source: string, target: string]: nothing -> bool {
   }
 
   if ($target | path exists) or $is_symlink {
-    log warning $"Trashing existing ($target) (restore with 'trash-restore')"
+    log warning $"Trashing existing ($target), restore with 'trash-restore'"
     do -i { ^trash $target }
   }
 

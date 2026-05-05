@@ -37,7 +37,7 @@ main() {
 
   echo ""
   log "Shell configuration complete."
-  log "Use nix run nixpkgs#nu -- ~/.fedora-config/scripts/setup.nu for further setup."
+  log "Use nix run nixpkgs#nushell -- ~/.fedora-config/scripts/setup.nu for further setup."
   echo ""
 }
 
