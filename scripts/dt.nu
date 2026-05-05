@@ -10,7 +10,7 @@ def ensure-name [name?: string] {
     if ($name | is-empty) { "default" } else { $name }
 }
 
-def "main create" [--image str, container_name?: string] {
+def "main create" [--image: string, container_name?: string] {
     let name = (ensure-name $container_name)
     let dir = ($env.BOXES_DIR | path join $name)
 
@@ -28,15 +28,15 @@ def "main enter" [container_name?: string] {
 }
 
 def "main fedora" [container_name = "fedora"] {
-  main create --image quay.io/repository/fedora/fedora-toolbox:44 $container_name
+  main create --image quay.io/fedora/fedora-toolbox:44 $container_name
 }
 
 def "main arch" [container_name = "arch"] {
-  main create --image quay.io/repository/arch/arch-toolbox:latest $container_name
+  main create --image quay.io/toolbx/arch-toolbox:latest $container_name
 }
 
 def "main ubuntu" [container_name = "ubuntu"] {
-  main create --image quay.io/repository/ubuntu/ubuntu-toolbox:26.04 $container_name
+  main create --image quay.io/toolbx/ubuntu-toolbox:25.04 $container_name
 }
 
 def "main debian" [container_name = "debian"] {
