@@ -63,7 +63,7 @@ system_install() {
   sudo dnf update -y
 
   log "Installing system dependencies..."
-  sudo dnf install -y git which less curl fish trash-cli
+  sudo dnf install -y git which tar unzip less curl fish trash-cli
 }
 main() {
   export PATH="/home/linuxbrew/.linuxbrew/bin:$HOME/.pixi/bin:$PATH"
