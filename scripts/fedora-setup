@@ -42,7 +42,7 @@ fish_config() {
   trash ~/.config/fish/config.fish
 
   log "Linking new config.fish..."
-  ln -sf "$DOT_DIR/config/fish/config.fish" ~/.config/fish/config.fish
+  ln -sf "$DOT_DIR/fish/config.fish" ~/.config/fish/config.fish
 
   log "Setting fish as default shell..."
   sudo chsh -s "$(which fish)" "$USER"
