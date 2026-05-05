@@ -12,16 +12,19 @@ end
 set -gx XDG_DATA_DIRS $HOME/.local/share/flatpak/exports/share $XDG_DATA_DIRS
 
 fish_add_path --global --move \
-    $HOME/.local/share/flatpak/exports/bin \
-    $DOT_DIR/scripts \
-    $HOME/bin \
-    $HOME/.local/bin \
-    $HOME/.cargo/bin \
-    $HOME/.local/kitty.app/bin
+  $HOME/.local/share/flatpak/exports/bin \
+  $DOT_DIR/scripts \
+  $HOME/bin \
+  $HOME/.local/bin \
+  $HOME/.cargo/bin \
+  $HOME/.local/kitty.app/bin
 
+if test -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+    source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+end
 
 function has_cmd
-    type -q $argv[1]
+  type -q $argv[1]
 end
 
 if ! status is-interactive
@@ -65,41 +68,37 @@ if has_cmd eza
 end
 
 if has_cmd uvx
-    alias uv-marimo-standalone 'uvx --with pyzmq --from "marimo[sandbox]" marimo edit --sandbox'
+  alias uv-marimo-standalone 'uvx --with pyzmq --from "marimo[sandbox]" marimo edit --sandbox'
 end
 
 if has_cmd zed
-    set -gx VISUAL zed
+  set -gx VISUAL zed
 else if has_cmd zeditor
-    set -gx VISUAL zeditor
+  set -gx VISUAL zeditor
 else if has_cmd code
-    set -gx VISUAL code
+  set -gx VISUAL code
 else if has_cmd antigravity
-    set -gx VISUAL antigravity
+  set -gx VISUAL antigravity
 end
 
 if has_cmd nvim
-    set -gx EDITOR nvim
+  set -gx EDITOR nvim
 else if has_cmd micro
-    set -gx EDITOR micro
+  set -gx EDITOR micro
 else if has_cmd emacs
-    set -gx EDITOR emacs
+  set -gx EDITOR emacs
 else if has_cmd vim
-    set -gx EDITOR vim
+  set -gx EDITOR vim
 else
-    set -gx EDITOR $VISUAL
-end
-
-if test -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
-    source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+  set -gx EDITOR $VISUAL
 end
 
 if test -f ~/.fedora-config/fish/local.fish
-    source ~/.fedora-config/fish/local.fish
+  source ~/.fedora-config/fish/local.fish
 end
 
 if test -f ~/.vite-plus/env.fish
-    source ~/.vite-plus/env.fish
+  source ~/.vite-plus/env.fish
 end
 
 alias gh-refresh 'gh auth refresh -h github.com'
@@ -112,11 +111,11 @@ if has_cmd nix
 end
 
 if test -n "$FISH_SIMPLE"
-    return
+  return
 end
 
 if has_cmd distrobox
-    alias dt 'distrobox'
+  alias dt 'distrobox'
 end
 
 if has_cmd incus
