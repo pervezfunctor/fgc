@@ -650,7 +650,7 @@ def "main home-manager" [] {
     return
   }
 
-  nix run home-manager -- switch --flake $"($env.HOME)/.fedora-config/scripts/home-manager#($env.USER)" --impure
+  nix run home-manager -- switch --flake $"($env.HOME)/.fedora-config/home-manager#($env.USER)" --impure
 }
 
 let ALL_COMMANDS = {
