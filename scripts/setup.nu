@@ -181,18 +181,21 @@ def set-fish-as-default-shell [] {
     }
   }
 
-  ^chsh -s $fish_path
+  ^sudo chsh -s $fish_path $env.USER
   if $env.LAST_EXIT_CODE == 0 {
-    log info $"Default shell set to fish \(($fish_path)\). Re-login to apply."
+    log info $"Default shell set to fish ($fish_path). Re-login to apply."
   } else {
     log error $"Failed to set fish as default shell. Try running 'chsh -s ($fish_path)' manually."
   }
 }
 
-def "main fish" [] {
-  si ["fish"]
+def "main fish config" [] {
   set-fish-as-default-shell
   main stow fish
+}
+
+def "main fish" [] {
+  si ["fish"]
 }
 
 def "main shell" [] {
@@ -650,7 +653,8 @@ def "main home-manager" [] {
     return
   }
 
-  nix run home-manager -- switch --flake $"($env.HOME)/.fedora-config/home-manager#($env.USER)" --impure
+  do -i { trash ~/.config/nushell/config.nu }
+  nix run home-manager -- switch --flake $"($env.HOME)/.fedora-config/home-manager#($env.USER)" --impure -b backup
 }
 
 let ALL_COMMANDS = {

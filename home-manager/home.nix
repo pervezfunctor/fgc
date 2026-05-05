@@ -1,5 +1,6 @@
 { pkgs, vars, ... }:
 {
+  news.display = "silent";
 
   nixpkgs.config.allowUnfree = true;
   fonts.fontconfig.enable = true;
@@ -8,7 +9,6 @@
     username = vars.username;
     homeDirectory = vars.homeDirectory;
     stateVersion = "25.11";
-    news.display = "silent";
 
     packages = with pkgs; [
       devbox
@@ -51,43 +51,38 @@
         show_banner = false;
       };
     };
+
+    eza = {
+      enable = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+
+    starship = {
+      enable = true;
+      enableFishIntegration = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
+    };
+
+    carapace = {
+      enable = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+
+    fzf = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+
+    zoxide = {
+      enable = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+
   };
-
-  #   fish = {
-  #     enable = true;
-  #   };
-
-  #   eza = {
-  #     enable = true;
-  #     enableFishIntegration = true;
-  #     enableNushellIntegration = true;
-  #   };
-
-  #   starship = {
-  #     enable = true;
-  #     enableFishIntegration = true;
-  #     enableZshIntegration = true;
-  #     enableNushellIntegration = true;
-  #   };
-
-  #   carapace = {
-  #     enable = true;
-  #     enableFishIntegration = true;
-  #     enableNushellIntegration = true;
-  #   };
-
-  #   fzf = {
-  #     enable = true;
-  #     enableFishIntegration = true;
-  #   };
-
-  #   zoxide = {
-  #     enable = true;
-  #     enableFishIntegration = true;
-  #     enableNushellIntegration = true;
-  #   };
-
-  # };
 
   nix = {
     package = pkgs.nix;
