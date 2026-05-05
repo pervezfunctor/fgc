@@ -70,8 +70,8 @@ main() {
 
   has_cmd dnf && system_install
   pixi_install
-  fish_config
   dotfiles_clone
+  fish_config
 
   echo ""
   log "Shell configuration complete."
