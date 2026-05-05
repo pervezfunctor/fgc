@@ -41,6 +41,7 @@ fish_config() {
   trash ~/.config/fish/config.fish || true
 
   log "Linking ($DOT_DIR/fish/config.fish) -> ($HOME/.config/fish/config.fish)"
+  mkdir -p ~/.config/fish 2>/dev/null || true
   ln -sf "$DOT_DIR/fish/config.fish" ~/.config/fish/config.fish
 
   log "Setting fish as default shell..."
