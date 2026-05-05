@@ -31,13 +31,11 @@ main() {
     git clone https://github.com/pervezfunctor/fedora-config "$DOT_DIR" || die "git clone failed"
   fi
 
-  sudo dnf update -y
-  sudo dnf install -y nix nix-daemon
-  sudo systemctl enable --now nix-daemon
-
+  curl -fsSL https://install.determinate.systems/nix | sh -s -- install
   has_cmd nix || die "nix is not installed. Quitting."
 
-  nix run nixpkgs#nushell -- "$DOT_DIR"/scripts/setup.nu shell || die "shell/fish setup failed"
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm
+  source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
   echo ""
   log "Shell configuration complete."

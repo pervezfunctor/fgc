@@ -92,6 +92,10 @@ else
     set -gx EDITOR $VISUAL
 end
 
+if test -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+end
+
 if test -f ~/.fedora-config/fish/local.fish
     source ~/.fedora-config/fish/local.fish
 end

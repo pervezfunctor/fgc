@@ -8,6 +8,7 @@
     username = vars.username;
     homeDirectory = vars.homeDirectory;
     stateVersion = "25.11";
+    news.display = "silent";
 
     packages = with pkgs; [
       devbox
