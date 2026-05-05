@@ -147,7 +147,7 @@ def touch-files [dir: string, files: list<string>] {
   }
 }
 
-def set-fish-as-default-shell [] {
+def "main fish default" [] {
   if not (has-cmd fish) { die "fish not found. Quitting." }
 
   let fish_path = (which fish | first | get path)
@@ -190,7 +190,7 @@ def set-fish-as-default-shell [] {
 }
 
 def "main fish config" [] {
-  set-fish-as-default-shell
+  main fish default
   main stow fish
 }
 
@@ -234,6 +234,7 @@ def "main shell" [] {
   do -i { sudo updatedb }
 
   main fish
+  main home-manager
 }
 
 def --env bootstrap [] {
@@ -635,7 +636,7 @@ def "main home-manager" [] {
 }
 
 let ALL_COMMANDS = {
-  "shell": {
+  shell: {
     desc: "Install shell tools and set Fish as default shell"
     run: {|| main shell }
   }
@@ -667,25 +668,29 @@ let ALL_COMMANDS = {
     desc: "Install and configure Zed editor"
     run: {|| main zed }
   }
-  "rust": {
+  rust: {
     desc: "Install and configure Rust toolchain"
     run: {|| main rust }
   }
-  "uv": {
+  uv: {
     desc: "Install and configure uv(Python)"
     run: {|| main uv }
   }
-  "vp": {
+  vp: {
     desc: "Install and configure Vite Plus(Node)"
     run: {|| main vp }
   }
-  "home-manager": {
+  home-manager: {
     desc: "Install and configure Home Manager"
     run: {|| main home-manager }
   }
-  "kitty": {
+  kitty: {
     desc: "Install and configure Kitty terminal"
     run: {|| main kitty }
+  }
+  fish: {
+    desc: "Install Fish shell and set as default"
+    run: {|| main fish }
   }
 }
 
