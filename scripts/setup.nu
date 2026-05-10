@@ -435,42 +435,6 @@ def "main wm" [] {
   main stow "xdg-desktop-portal"
 }
 
-def "main greetd keyring fix" [] {
-  let pam_file = "/etc/pam.d/greetd"
-
-  if not ($pam_file | path exists) {
-    error+ "PAM file not found: ($pam_file)"
-    return
-  }
-
-  let lines = (open $pam_file | lines)
-
-  let new_lines = ($lines | each {|l|
-    if ($l | str contains "pam_gnome_keyring.so") {
-      $l | str replace --regex '^\s*-' ''
-    } else {
-      $l
-    }
-  })
-
-  if $lines == $new_lines {
-    print "No changes needed."
-    exit
-  }
-
-  let backup = $"($pam_file).bak"
-
-  cp $pam_file $backup
-
-  # @TODO: FIX PERMISSIONS
-  $new_lines
-  | str join (char nl)
-  | save --force $pam_file
-
-  print $"Updated ($pam_file)"
-  print $"Backup written to ($backup)"
-}
-
 def "main greetd" [] {
   if not (has-cmd dms) {
     log error "dms is not installed. Cannot setup greetd."
