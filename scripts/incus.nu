@@ -66,6 +66,8 @@ package_update: true
 packages:
   - qemu-guest-agent
   - openssh-server
+  - wget
+  - curl
 runcmd:
   - systemctl enable --now ($ssh_service)
 "
@@ -102,13 +104,15 @@ def "main ssh" [name: string] {
 }
 
 def "main destroy" [name: string] {
-  incus stop $name
+  do -i { incus stop $name }
   incus delete $name
 }
 
 def "main post-setup" [] {
-  sudo systemctl enable --now incus.socket
-  incus admin init --minimal
-  sudo firewall-cmd --zone=trusted --change-interface=incusbr0 --permanent
-  sudo firewall-cmd --reload
+  do -i { sudo systemctl enable --now incus.socket }
+  do -i { incus admin init }
+  do -i {
+    sudo firewall-cmd --zone=trusted --change-interface=incusbr0 --permanent
+    sudo firewall-cmd --reload
+  }
 }
