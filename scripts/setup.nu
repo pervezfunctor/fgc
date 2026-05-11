@@ -31,13 +31,18 @@ def "main brew" [] {
     brew-install
 }
 
+def "main zed" [] {
+    main dev zed
+}
+
 def "main help" [] {
     print $"Usage: setup.nu <command> [args...]
 
 Commands:
   niri              Install and configure niri
   apps              Install apps like zen browser, obsidian, papers
-  dev               Development tools \(rust, uv, vp, zed\)
+  dev               Development tools \(rust, uv, vp\)
+  zed               Install and configure Zed editor
   vscode            Install and configure vscode
   libvirt           Install and configure libvirt/virt-manager
   brew              Install Homebrew
