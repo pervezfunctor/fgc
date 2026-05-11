@@ -29,9 +29,9 @@ def main [] {
   "set -gx DEMO 1" | save -f ($dot_dir | path join "homepkg/dot-demo")
 
   with-env { HOME: $home, DOT_DIR: $dot_dir } {
-    main config git
-    main config nvim
-    main home homepkg
+    stow.nu config git
+    stow.nu config nvim
+    stow.nu home homepkg
   }
 
   assert-link ($home | path join ".config/git/.gitconfig") ($dot_dir | path join "git/dot-gitconfig")
