@@ -116,8 +116,8 @@ main() {
 
   has_cmd dnf && system_install
   dotfiles_install
-  fish_install
   pixi_install
+  fish_install
 
   log "╔══════════════════════════════════════╗"
   log "║   Fedora Configuration complete.     ║"
