@@ -1,7 +1,9 @@
+#!/usr/bin/env nu
+
 use std/log
 use ./lib.nu *
 
-def "main gnome extensions" [] {
+def "main extensions" [] {
   if not (has-cmd gext) {
     if not (has-cmd pipx) {
       log error "pipx not found, skipping gnome extensions"
@@ -29,7 +31,7 @@ def "main gnome extensions" [] {
   }
 }
 
-def "main gnome flatpaks" [] {
+def "main flatpaks" [] {
   if not (has-cmd flatpak) {
     log error "flatpak not found, skipping gnome flatpaks"
     return
@@ -52,7 +54,7 @@ def "main gnome flatpaks" [] {
   }
 }
 
-def "main gnome settings" [] {
+def "main settings" [] {
   if not (has-cmd gsettings) {
     log error "gsettings not found, skipping gnome settings"
     return
@@ -79,7 +81,7 @@ def "main gnome settings" [] {
   }
 }
 
-def "main gnome keybindings" [] {
+def "main keybindings" [] {
   if not (has-cmd dconf) {
     log error "dconf not found, skipping gnome keybindings"
     return
@@ -139,12 +141,68 @@ def "main gnome keybindings" [] {
 }
 
 def "main help" [] {
-  log info "Available commands:"
-  log info "  main gnome extensions"
-  log info "  main gnome settings"
-  log info "  main gnome keybindings"
-  log info "  main gnome flatpaks"
-  log info "  main help"
+  print $"Usage: gnome.nu <command>
+  Available commands:
+  extensions     Install GNOME extensions\(paperwm etc\)
+  packages       Install GNOME packages
+  settings       Configure GNOME settings
+  keybindings    Configure GNOME keybindings
+  flatpaks       Manage GNOME flatpaks
+  ptyxis         Configure Ptyxis terminal
+  help           Show this help message
+  "
+}
+
+def is-flatpak [name: string] {
+  (flatpak list --columns=application | str contains $name)
+}
+
+def "main ptyxis" [] {
+  if not (has-cmd gsettings) {
+    log error "gsettings not found, skipping Ptyxis configuration"
+    return
+  }
+  if not (has-cmd dconf) {
+    log error "dconf not found, skipping Ptyxis configuration"
+    return
+  }
+  if not (has-cmd ptyxis) and not (is-flatpak "org.gnome.Ptyxis") {
+    log info "ptyxis not found, Installing..."
+    if (is-atomic) {
+      fpi "org.gnome.Ptyxis"
+    } else {
+      si ["ptyxis"]
+    }
+  }
+
+  log info "Configuring Ptyxis"
+
+  gsettings set org.gnome.Ptyxis use-system-font false
+  gsettings set org.gnome.Ptyxis font-name 'Cascadia Code NF 12'
+  gsettings set org.gnome.Ptyxis interface-style 'dark'
+
+  let profid = (
+    gsettings get org.gnome.Ptyxis default-profile-uuid
+    | str trim --char "'"
+  )
+
+  gsettings set $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/" opacity 0.85
+  gsettings set $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/" palette "Everforest"
+
+  # is flatpak
+  # let profid = (
+  #   flatpak run --command=gsettings app.devsuite.Ptyxis \
+  #     get org.gnome.Ptyxis default-profile-uuid
+  #   | str trim --char "'"
+  # )
+
+  # flatpak run --command=gsettings app.devsuite.Ptyxis \
+  #   set $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/" \
+  #   opacity 0.85
+
+  # flatpak run --command=gsettings app.devsuite.Ptyxis \
+  #   set $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/" \
+  #   palette "Everforest"
 }
 
 def "main packages" [] {
@@ -156,8 +214,10 @@ def "main packages" [] {
 
 def "main" [] {
   fonts
-  main gnome extensions
-  main gnome settings
-  main gnome keybindings
-  main gnome flatpaks
+  main packages
+  main extensions
+  main settings
+  main keybindings
+  main flatpaks
+  main ptyxis
 }
