@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 # trap 'echo "Error on line $LINENO: $BASH_COMMAND"' ERR
-trap 'rc=$?; echo "ERROR rc=$rc line=$LINENO cmd=$BASH_COMMAND" >&2' ERR
+trap 'echo "ERROR rc=$? line=$LINENO cmd=$BASH_COMMAND" >&2' ERR
 
 readonly REPO_NAME="fedora-config"
 readonly DOT_DIR="$HOME/.${REPO_NAME}"
