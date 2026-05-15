@@ -37,6 +37,8 @@ def "main flatpaks" [] {
     return
   }
 
+  ui.nu flathub
+
   let flatpaks = [
     "com.mattjakeman.ExtensionManager"
     "org.gtk.Gtk3theme.adw-gtk3"
@@ -74,13 +76,23 @@ def "main settings" [] {
   }
 
   do -i {
-    dconf write /org/gnome/shell/extensions/paperwm/show-workspace-indicator false
-    dconf write /org/gnome/shell/extensions/paperwm/show-window-position-bar false
     dconf write /org/gnome/shell/extensions/blur-my-shell/panel/blur "false"
+    dconf write /org/gnome/shell/extensions/blur-my-shell/applications/whitelist "['org.gnome.Ptyxis', 'dev.zed.Zed']"
 
     dconf write /org/gnome/shell/extensions/switcher/max-width-percentage "uint32 25"
     dconf write /org/gnome/shell/extensions/switcher/font-size "uint32 16"
     dconf write /org/gnome/shell/extensions/switcher/icon-size "uint32 16"
+
+    dconf write /org/gnome/shell/extensions/paperwm/show-workspace-indicator false
+    dconf write /org/gnome/shell/extensions/paperwm/show-window-position-bar false
+
+    dconf write /org/gnome/shell/extensions/paperwm/cycle-width-steps "[0.3333, 0.5, 0.6667]"
+
+    dconf write /org/gnome/shell/extensions/paperwm/selection-border-size 5
+    dconf write /org/gnome/shell/extensions/paperwm/window-gap 12
+    dconf write /org/gnome/shell/extensions/paperwm/horizontal-margin 12
+    dconf write /org/gnome/shell/extensions/paperwm/vertical-margin 12
+    dconf write /org/gnome/shell/extensions/paperwm/vertical-margin-bottom 12
   }
 }
 
@@ -139,7 +151,7 @@ def "main keybindings" [] {
   dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-4 "['<Super>4']"
   dconf write /org/gnome/desktop/wm/preferences/workspace-names "['1', '2', '3', '4']"
 
-  # gnome-shortcut.nu create "Terminal" -c "ptyxis -s" -s "<Super>Return"
+  gnome-shortcut.nu create "Terminal" -c "ptyxis -s" -s "<Super>Return"
 
   # dconf write /org/gnome/shell/extensions/search-light/secondary-shortcut-search "['<Super>d']"
   # dconf write /org/gnome/shell/extensions/search-light/primary-shortcut-search "['<Super>Space']"
@@ -184,6 +196,15 @@ def is-flatpak [name: string] {
   (flatpak list --columns=application | str contains $name)
 }
 
+def "font exists" [font_name: string] {
+  (fc-list : family
+  | lines
+  | each {|line| $line | split row "," }
+  | flatten
+  | each {|name| $name | str trim }
+  | any {|name| $name == $font_name })
+}
+
 def "main ptyxis" [] {
   if not (has-cmd gsettings) {
     log error "gsettings not found, skipping Ptyxis configuration"
@@ -205,16 +226,26 @@ def "main ptyxis" [] {
   log info "Configuring Ptyxis"
 
   gsettings set org.gnome.Ptyxis use-system-font false
-  gsettings set org.gnome.Ptyxis font-name 'Cascadia Mono NF 12'
   gsettings set org.gnome.Ptyxis interface-style 'system'
+
+  if (font exists 'Cascadia Mono NF') {
+    gsettings set org.gnome.Ptyxis font-name 'Cascadia Mono NF 11'
+  } else if (font exists '') {
+    gsettings set org.gnome.Ptyxis font-name ''
+  }
 
   let profid = (
     gsettings get org.gnome.Ptyxis default-profile-uuid
     | str trim --char "'"
   )
 
-  gsettings set $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/" opacity 0.85
-  gsettings set $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/" palette "Everforest"
+  let profile = $"org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/($profid)/"
+  gsettings set $profile opacity 0.85
+  gsettings set $profile palette "Everforest"
+
+  if (is-atomic) {
+    gsettings set $profile custom-command '/usr/bin/fish'
+  }
 
   # is flatpak
   # let profid = (
