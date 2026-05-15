@@ -180,12 +180,6 @@ export def "fonts" [] {
   ]
 }
 
-export def stow [...args: string] {
-  for arg in $args {
-    stow config $arg
-  }
-}
-
 export def multi-task [items: list<record<description: string, handler: closure>>] {
   let selected = ($items | input list --multi --display description "Select tasks to execute:")
 
