@@ -77,6 +77,10 @@ def "main settings" [] {
     dconf write /org/gnome/shell/extensions/paperwm/show-workspace-indicator false
     dconf write /org/gnome/shell/extensions/paperwm/show-window-position-bar false
     dconf write /org/gnome/shell/extensions/blur-my-shell/panel/blur "false"
+
+    dconf write /org/gnome/shell/extensions/switcher/max-width-percentage "uint32 25"
+    dconf write /org/gnome/shell/extensions/switcher/font-size "uint32 16"
+    dconf write /org/gnome/shell/extensions/switcher/icon-size "uint32 16"
   }
 }
 
