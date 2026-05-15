@@ -60,11 +60,11 @@ Create a Debian VM with
 incus.nu debian         # one of debian, fedora, ubuntu, tumbleweed and arch
 ```
 
-Wait for cloud-init to finish, this might take a while. Then list all VMs and SSH into the one you just created.
+Wait for a few minutes(for cloud-init to finish). Then list all VMs, confirm they have IPv4 address assigned and SSH into the one you just created.
 
 ```sh
 incus.nu list
-incus.nu ssh <name>
+incus.nu ssh <name> # or ssh "$USER"@<ip-address>
 ```
 
 For additional commands
@@ -116,6 +116,8 @@ setup.nu libvirt      # install and configure libvirt
 
 ## Bluefin
 
+Few of the scripts(not all) from this repository should work on bluefin too.
+
 First switch to devmode
 
 ```sh
@@ -128,8 +130,20 @@ Restart computer and setup dev groups
 ujust dx-group
 ```
 
-Now run the following script
+You need to restart again. After restarting run the following script to setup bluefin.
 
 ```sh
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fedora-config/main/scripts/bluefin-setup)"
 ```
+
+Restart your system, and set fish as your shell in your `ptyxis` default profile settings.
+
+You should have `incus`, `vscode`, `virt-manager` installed(bluefin dx mode).
+
+For development tools for Python, Web, Rust
+
+```sh
+setup.nu dev
+```
+
+I personally don't use vanilla fedora atomic distributions anymore. Above scripts might not work on Silverblue for example.
