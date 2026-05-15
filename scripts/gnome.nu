@@ -178,7 +178,7 @@ def "main ptyxis" [] {
   log info "Configuring Ptyxis"
 
   gsettings set org.gnome.Ptyxis use-system-font false
-  gsettings set org.gnome.Ptyxis font-name 'Cascadia Code NF 12'
+  gsettings set org.gnome.Ptyxis font-name 'Cascadia Mono NF 12'
   gsettings set org.gnome.Ptyxis interface-style 'dark'
 
   let profid = (
