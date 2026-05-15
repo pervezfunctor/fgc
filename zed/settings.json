@@ -32,14 +32,13 @@
   },
 
   "ui_font_family": "Adwaita Sans",
-  "ui_font_size": 16,
-  // "buffer_font_family": "JetBrainsMono Nerd Font",
-  "buffer_font_family": "Cascadia Mono NF",
-  "buffer_font_size": 15,
+  "ui_font_size": 15,
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "buffer_font_size": 14,
   "theme": {
     "mode": "system",
     "light": "Everforest Light Hard (blur)",
-    "dark": "Everforest Dark Soft (blur)",
+    "dark": "Everforest Dark Hard (blur)",
   },
 
   "ensure_final_newline_on_save": true,

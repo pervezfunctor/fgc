@@ -116,7 +116,7 @@ system_install() {
 
 packages_install() {
   log "Installing pixi packages..."
-  pixi global install nushell starship carapace
+  pixi global install nushell sd starship carapace
   if has_cmd rpm-ostree; then
     pixi global install go-shfmt "${COMMON_PACKAGES[@]}"
   fi

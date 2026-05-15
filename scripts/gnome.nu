@@ -42,7 +42,6 @@ def "main flatpaks" [] {
     "org.gtk.Gtk3theme.adw-gtk3"
     "org.gtk.Gtk3theme.adw-gtk3-dark"
     "io.github.swordpuffin.rewaita"
-    "flatpak run dev.qwery.AddWater"
   ]
   for pkg in $flatpaks {
     do -i { flatpak --user install -y flathub $pkg }
@@ -140,6 +139,30 @@ def "main keybindings" [] {
   # dconf write /org/gnome/shell/extensions/search-light/primary-shortcut-search "['<Super>Space']"
 }
 
+def "main jetbrains mono" [] {
+    if (file_exists ~/.local/share/fonts/JetBrainsMonoNLNerdFontPropo-Regular.ttf) {
+        return 0
+    }
+
+    log+ "Installing JetBrains Mono Nerd Font"
+    mkdir ~/.local/share/fonts
+    trash /tmp/jetbrains-mono/tmp/jetbrains-mono.zip
+    wget -nv https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip -O /tmp/jetbrains-mono.zip
+    unzip -qq -d /tmp/jetbrains-mono -o /tmp/jetbrains-mono.zip
+    cp /tmp/jetbrains-mono/*.ttf ~/.local/share/fonts
+    trash /tmp/jetbrains-mono/tmp/jetbrains-mono.zip
+    slog "JetBrains Mono Nerd Font installation done!"
+}
+
+def "main jetbrains mono fix" [] {
+  (rg
+    --files-with-matches
+    --fixed-strings 'Cascadia Mono NF' .
+    | lines
+    | each {|f| sd 'Cascadia Mono NF' 'JetBrains Mono NF' $f }
+  )
+}
+
 def "main help" [] {
   print $"Usage: gnome.nu <command>
   Available commands:
@@ -149,6 +172,7 @@ def "main help" [] {
   keybindings    Configure GNOME keybindings
   flatpaks       Manage GNOME flatpaks
   ptyxis         Configure Ptyxis terminal
+  jetbrains mono Install JetBrains Mono Nerd Font
   help           Show this help message
   "
 }
