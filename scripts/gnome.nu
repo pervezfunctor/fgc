@@ -144,27 +144,25 @@ def "main keybindings" [] {
 }
 
 def "main jetbrains mono" [] {
-    if (file_exists ~/.local/share/fonts/JetBrainsMonoNLNerdFontPropo-Regular.ttf) {
-        return 0
+    if (fc-list | lines | where $it =~ "(?i)jetbrains.*nerd" | is-not-empty) {
+      log+ "JetBrains Mono Nerd Font already installed"
+      return
     }
 
     log+ "Installing JetBrains Mono Nerd Font"
     mkdir ~/.local/share/fonts
-    trash /tmp/jetbrains-mono/tmp/jetbrains-mono.zip
+    rm -rf /tmp/jetbrains-mono.zip /tmp/jetbrains-mono
     wget -nv https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip -O /tmp/jetbrains-mono.zip
     unzip -qq -d /tmp/jetbrains-mono -o /tmp/jetbrains-mono.zip
-    cp /tmp/jetbrains-mono/*.ttf ~/.local/share/fonts
-    trash /tmp/jetbrains-mono/tmp/jetbrains-mono.zip
-    slog "JetBrains Mono Nerd Font installation done!"
+    glob "/tmp/jetbrains-mono/*.ttf" | each { |f| cp $f ~/.local/share/fonts/ }
+    rm -rf /tmp/jetbrains-mono.zip /tmp/jetbrains-mono
+    log+ "JetBrains Mono Nerd Font installation done!"
 }
 
 def "main jetbrains mono fix" [] {
-  (rg
-    --files-with-matches
-    --fixed-strings 'Cascadia Mono NF' .
-    | lines
-    | each {|f| sd 'Cascadia Mono NF' 'JetBrains Mono NF' $f }
-  )
+  grep -rlF 'Cascadia Mono NF' .
+  | lines
+  | each {|f| sed -i 's/Cascadia Mono NF/JetBrainsMono Nerd Font/g' $f }
 }
 
 def "main help" [] {
