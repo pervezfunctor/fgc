@@ -153,3 +153,22 @@ export def stow [...args: string] {
     nu $"($env.DOT_DIR)/scripts/stow.nu" $arg
   }
 }
+
+export def multi-task [items: list<record<description: string, handler: closure>>] {
+  let selected = ($items | input list --multi --display description "Select tasks to execute:")
+
+  if ($selected | is-empty) {
+    log info "No tasks selected."
+    return
+  }
+
+  for item in $selected {
+    log info $"Executing: ($item.description)"
+    try {
+      do $item.handler
+    } catch {|err|
+      log error $"($item.description) failed."
+      $err | print
+    }
+  }
+}
