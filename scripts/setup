@@ -387,7 +387,7 @@ fonts_install() {
   has_cmd brew || brew_install
   log "Installing fonts..."
   brew install --cask font-jetbrains-mono-nerd-font font-fontawesome font-monaspice-nerd-font
-  fc-fc-cache -fv
+  fc-cache -fv
 }
 
 gnome_packages() {
