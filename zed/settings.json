@@ -22,6 +22,7 @@
     "make": true,
     "neocmake": true,
     "nu": true,
+    "toml": true,
   },
 
   "cli_default_open_behavior": "new_window",
