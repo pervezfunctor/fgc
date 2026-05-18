@@ -175,7 +175,6 @@ readonly COMMON_PACKAGES=(
   fzf
   gdu
   gh
-  gum
   htop
   jq
   micro
