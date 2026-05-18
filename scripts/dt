@@ -124,7 +124,7 @@ cmd_delete() {
   local dir="$BOXES_DIR/$name"
 
   log_info "Deleted container: $name"
-  distrobox rm -y "$name"
+  distrobox rm "$name"
 
   if prompt_yn "Trash directory $dir?"; then
     log_info "Trashed container directory: $dir"
