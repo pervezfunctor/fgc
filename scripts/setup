@@ -204,6 +204,7 @@ shell_packages_install() {
     pixi global install "${COMMON_PACKAGES[@]}"
   else
     log "Updating packages..."
+    sudo dnf clean all
     sudo dnf update -y --refresh
 
     log "Installing system dependencies..."
@@ -364,7 +365,7 @@ gnome_keybindings() {
   dconf write /org/gnome/shell/extensions/search-light/secondary-shortcut-search "['<Super>d']"
   dconf write /org/gnome/shell/extensions/search-light/primary-shortcut-search "['<Super>Space']"
 
-  # gnome-shortcut "Terminal" "ptyxis -s" "<Super>Return"
+  gnome-shortcut "Terminal" "ptyxis -s" "<Super>Return" || true
 }
 
 gnome_ptyxis() {
@@ -400,10 +401,24 @@ fonts_install() {
 gnome_packages() {
   fonts_install
 
+  local -a pkgs=(
+    ptyxis
+    gnome-power-manager
+    gdm
+    gnome-tweaks
+    google-noto-color-emoji-fonts
+    gnome-extensions-app
+    xdg-utils
+  )
+
   if ! is_atomic; then
     log "Installing system packages..."
-    sudo dnf install -y gnome-tweaks 2>/dev/null || true
+    sudo dnf install -y "${pkgs[@]}" 2>/dev/null || true
   fi
+
+  # sudo systemctl set-default graphical.target
+  # sudo systemctl enable gdm
+  # reboot
 }
 
 cmd_gnome() {
