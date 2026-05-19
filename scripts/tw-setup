@@ -111,6 +111,7 @@ fish_install() {
   fi
 
   log "Deploying fish config..."
+  trash ~/.config/fish/config.fish 2>/dev/null || true
   ln -sf ~/.fedora-config/fish/config.fish ~/.config/fish/config.fish
 }
 
