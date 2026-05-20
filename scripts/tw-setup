@@ -112,6 +112,7 @@ fish_install() {
 
   log "Deploying fish config..."
   trash ~/.config/fish/config.fish 2>/dev/null || true
+  mkdir ~/.config/fish
   ln -sf ~/.fedora-config/fish/config.fish ~/.config/fish/config.fish
 }
 
