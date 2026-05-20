@@ -91,6 +91,12 @@ For additional commands
 vm help
 ```
 
+If you prefer `virt-manager` for installing desktop linux distributions, install with dnf and restart your computer.
+
+```sh
+sudo dnf install -y virt-manager
+```
+
 ## Gnome setup
 
 To setup gnome almost like niri, and use scrolling layout(paperwm), use the following script
