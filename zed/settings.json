@@ -18,6 +18,7 @@
     "dockerfile": true,
     "everforest": true,
     "fish": true,
+    "git-firefly": true,
     "kdl": true,
     "make": true,
     "neocmake": true,
