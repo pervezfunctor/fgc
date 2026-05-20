@@ -530,7 +530,6 @@ cmd_dev_ai() {
   has_cmd npm || cmd_dev_vp
 
   local npm_pkgs=(
-    "@google/gemini-cli"
     "opencode-ai"
     "@openai/codex"
     "@augmentcode/auggie"
@@ -540,6 +539,9 @@ cmd_dev_ai() {
   for pkg in "${npm_pkgs[@]}"; do
     vp install -g "$pkg"
   done
+
+  # antigravity cli
+  curl -fsSL https://antigravity.google/cli/install.sh | bash
 }
 
 cmd_dev() {
