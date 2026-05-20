@@ -192,7 +192,8 @@ cmd_destroy() {
 
 cmd_install_post() {
   log_info "Initializing incus admin with $INCUS_CONFIG"
-  incus-admin -- incus admin init --preseed <"$INCUS_CONFIG" || true
+  incus admin init
+  # incus admin init --preseed <"$INCUS_CONFIG" || true
 }
 
 cmd_start() {
