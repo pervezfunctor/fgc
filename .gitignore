@@ -9,3 +9,4 @@ node_modules/
 scratch.*
 telemetry-id
 .claude/
+.antigravitycli/
