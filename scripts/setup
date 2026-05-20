@@ -404,24 +404,30 @@ fonts_install() {
 gnome_packages() {
   fonts_install
 
-  local -a pkgs=(
-    ptyxis
-    gnome-power-manager
-    gdm
-    gnome-tweaks
-    google-noto-color-emoji-fonts
-    gnome-extensions-app
-    xdg-utils
-  )
-
   if ! is_atomic; then
     log "Installing system packages..."
-    sudo dnf install -y "${pkgs[@]}" 2>/dev/null || true
+    sudo dnf install -y ptyxis gnome-tweaks 2>/dev/null || true
   fi
+}
 
-  # sudo systemctl set-default graphical.target
-  # sudo systemctl enable gdm
-  # reboot
+gnome_gdm() {
+  local -a pkgs=(
+    gdm
+    gnome-extensions-app
+    xdg-utils
+    gnome-power-manager
+    google-noto-color-emoji-fonts
+    nautilus
+    gvfs-smb
+    gvfs-nfs
+  )
+  sudo dnf install -y "${pkgs[@]}"
+
+  sudo systemctl set-default graphical.target
+  sudo systemctl enable gdm
+  sudo systemctl disable sddm 2>/dev/null || true
+
+  log "gdm config complete. Reboot your computer"
 }
 
 gnome_wallpapers() {
