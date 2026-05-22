@@ -301,7 +301,7 @@ gnome_settings() {
   dconf write /org/gnome/shell/extensions/switcher/font-size "uint32 16"
   dconf write /org/gnome/shell/extensions/switcher/icon-size "uint32 16"
   dconf write /org/gnome/shell/extensions/switcher/matching "uint32 1"
-  dconf wrtite /org/gnome/shell/extensions/switcher/activate-by-key "uint32 2"
+  dconf write /org/gnome/shell/extensions/switcher/activate-by-key "uint32 2"
 
   dconf write /org/gnome/shell/extensions/paperwm/show-workspace-indicator false
   dconf write /org/gnome/shell/extensions/paperwm/show-window-position-bar false
@@ -431,12 +431,14 @@ gnome_gdm() {
 }
 
 gnome_wallpapers() {
+  is_atomic && return 0
+
   sudo dnf install -y desktop-backgrounds-gnome
-  if has_cmd brew; then
+  if has_cmd brew && ! is_atomic; then
     brew install --cask bluefin-wallpapers bluefin-wallpapers-extra
   fi
 
-  dconf write /org/gnome/desktop/background/picture-uri 'file:///home/pervez/.local/share/backgrounds/bluefin/04-bluefin.xml' || true
+  dconf write /org/gnome/desktop/background/picture-uri "file:///home/pervez/.local/share/backgrounds/bluefin/04-bluefin.xml"
 }
 
 cmd_gnome() {
