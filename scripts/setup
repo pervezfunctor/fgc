@@ -234,13 +234,9 @@ fpi() {
   done
 }
 
-gnome_flathub() {
+gnome_flatpaks() {
   has_cmd flatpak || sudo dnf install -y flatpak
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo --user
-}
-
-gnome_flatpaks() {
-  gnome_flathub
 
   local flatpaks=(
     "com.github.tchx84.Flatseal"
@@ -283,6 +279,24 @@ gnome_extensions() {
   done
 }
 
+gnome_rewaita() {
+  cat >~/.var/app/io.github.swordpuffin.rewaita/data/prefs.json <<EOF
+  {
+      "light-theme": "Everforest \ud83c\udf32.css",
+      "dark-theme": "Everforest \ud83c\udf32.css",
+      "window-controls": "colored",
+      "modify-gtk3-theme": true,
+      "modify-gnome-shell": true,
+      "run-in-background": true,
+      "transparency": false,
+      "window": false,
+      "sharp": false,
+      "firefox-theme": true,
+      "light-text": false
+  }
+EOF
+}
+
 gnome_settings() {
   gsettings set org.gnome.desktop.input-sources xkb-options "['caps:ctrl_modifier']"
   gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
@@ -313,6 +327,8 @@ gnome_settings() {
   dconf write /org/gnome/shell/extensions/paperwm/horizontal-margin 12
   dconf write /org/gnome/shell/extensions/paperwm/vertical-margin 12
   dconf write /org/gnome/shell/extensions/paperwm/vertical-margin-bottom 12
+
+  gnome_rewaita
 }
 
 gnome_keybindings() {
@@ -365,8 +381,8 @@ gnome_keybindings() {
   dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-4 "['<Super>4']"
   dconf write /org/gnome/desktop/wm/preferences/workspace-names "['1', '2', '3', '4']"
 
-  dconf write /org/gnome/shell/extensions/search-light/secondary-shortcut-search "['<Super>d']"
-  dconf write /org/gnome/shell/extensions/search-light/primary-shortcut-search "['<Super>Space']"
+  # dconf write /org/gnome/shell/extensions/search-light/secondary-shortcut-search "['<Super>d']"
+  # dconf write /org/gnome/shell/extensions/search-light/primary-shortcut-search "['<Super>Space']"
 
   gnome-shortcut "Terminal" "ptyxis -s" "<Super>Return" || true
 }
@@ -383,6 +399,16 @@ gnome_ptyxis() {
 
   local profid
   profid="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
+  if [ -z "$profid" ]; then
+    nohup some_app >/dev/null 2>&1 &
+    disown
+    sleep 1
+    profid="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
+    if [ -z "$profid" ]; then
+      error "Failed to create default profile in Ptyxis"
+      return
+    fi
+  fi
 
   local profile="org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/${profid}/"
   gsettings set "$profile" opacity 0.85
@@ -414,12 +440,20 @@ gnome_gdm() {
   local -a pkgs=(
     gdm
     gnome-extensions-app
-    xdg-utils
     gnome-power-manager
+    gnome-gnome-control-center
+    gnome-system-monitor
+    gnome-disk-utility
+    papers
+    imv
+    mpv
     google-noto-color-emoji-fonts
-    nautilus
-    gvfs-smb
     gvfs-nfs
+    gvfs-smb
+    nautilus
+    udiskie
+    udisks2
+    xdg-utils
   )
   sudo dnf install -y "${pkgs[@]}"
 
@@ -430,15 +464,17 @@ gnome_gdm() {
   log "gdm config complete. Reboot your computer"
 }
 
-gnome_wallpapers() {
-  is_atomic && return 0
-
-  sudo dnf install -y desktop-backgrounds-gnome
-  if has_cmd brew && ! is_atomic; then
-    brew install --cask bluefin-wallpapers bluefin-wallpapers-extra
+gnome_wallpaper() {
+  if [ -f ~/.config/wallpaper/green_sea.jpg ]; then
+    return 0
   fi
 
-  dconf write /org/gnome/desktop/background/picture-uri "file:///home/pervez/.local/share/backgrounds/bluefin/04-bluefin.xml"
+  mkdir -p ~/.config/wallpaper
+  curl -L -o ~/.config/wallpaper/green_sea.jpg 'https://raw.githubusercontent.com/mylinuxforwork/wallpaper/main/green_sea.jpg'
+
+  gsettings set org.gnome.desktop.background picture-uri "$HOME/.config/wallpaper/green_sea.jpg"
+  gsettings set org.gnome.desktop.background picture-uri-dark "$HOME/.config/wallpaper/green_sea.jpg"
+  gsettings set org.gnome.desktop.screensaver picture-uri "$HOME/.config/wallpaper/green_sea.jpg"
 }
 
 cmd_gnome() {
@@ -459,7 +495,7 @@ cmd_gnome() {
   settings) gnome_settings ;;
   keybindings) gnome_keybindings ;;
   ptyxis) gnome_ptyxis ;;
-  wallpapers) gnome_wallpapers ;;
+  wallpapers) gnome_wallpaper ;;
   help)
     cat <<'EOF'
 Usage: setup gnome <command>
@@ -481,7 +517,7 @@ EOF
     gnome_settings
     gnome_ptyxis
     gnome_keybindings
-    gnome_wallpapers
+    gnome_wallpaper
     ;;
   *)
     error "Unknown command: $subcmd"
