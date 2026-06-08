@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly REPO_NAME="fedora-config"
+readonly REPO_NAME="fgc"
 readonly DOT_DIR="$HOME/.${REPO_NAME}"
 
 log() {
@@ -94,7 +94,7 @@ dotfiles_install() {
     log "Cloning dotfiles repository..."
     has_cmd git || die "git is required but not installed"
 
-    git clone https://github.com/pervezfunctor/fedora-config "$DOT_DIR" ||
+    git clone https://github.com/pervezfunctor/fgc "$DOT_DIR" ||
       die "git clone failed"
   fi
 }
@@ -113,8 +113,8 @@ fish_install() {
   log "Deploying fish config..."
   trash ~/.config/fish/config.fish 2>/dev/null || true
   mkdir -p ~/.config/fish 2>/dev/null || true
-  log "Creating link from ~/.fedora-config/fish/config.fish to ~/.config/fish/config.fish"
-  ln -sf ~/.fedora-config/fish/config.fish ~/.config/fish/config.fish
+  log "Creating link from ~/.fgc/fish/config.fish to ~/.config/fish/config.fish"
+  ln -sf ~/.fgc/fish/config.fish ~/.config/fish/config.fish
 }
 
 docker_install() {

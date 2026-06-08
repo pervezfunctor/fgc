@@ -13,17 +13,17 @@ sudo rpm-ostree upgrade # silverblue
 Then run the following bootstrap script
 
 ```sh
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fedora-config/main/scripts/setup)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fgc/main/scripts/setup)"
 ```
 
-This script clones this repo to `~/.fedora-config`, and add a single line to your ~/.bashrc to put all scripts on PATH.
+This script clones this repo to `~/.fgc`, and add a single line to your ~/.bashrc to put all scripts on PATH.
 
 ## Shell
 
 Restart your terminal and execute the following script. This install shell tools and sets up fish as default.
 
 ```sh
-setup shell
+fgc shell
 ```
 
 Reboot your computer and open terminal. You should be in fish shell.
@@ -43,17 +43,17 @@ chsh -s $(which fish)
 Install node(vite+), Rust(rustup), Python(uv).
 
 ```sh
-setup dev
+fgc dev
 ```
 
 Install and setup your preferred editor
 
 ```sh
-setup.nu zed
+fgc zed
 ```
 
 ```sh
-setup.nu vscode
+fgc vscode
 ```
 
 ## Virtual Machines

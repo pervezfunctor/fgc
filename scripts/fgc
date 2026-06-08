@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 trap 'echo "ERROR rc=$? line=$LINENO cmd=$BASH_COMMAND" >&2' ERR
 
-readonly REPO_NAME="fedora-config"
+readonly REPO_NAME="fgc"
 readonly DOT_DIR="$HOME/.${REPO_NAME}"
 
 log() {
@@ -64,7 +64,7 @@ dotfiles_install() {
   has_cmd git || die "git is not installed. Quitting."
 
   log "Cloning dotfiles..."
-  git clone https://github.com/pervezfunctor/fedora-config "$DOT_DIR" || die "git clone failed"
+  git clone https://github.com/pervezfunctor/fgc "$DOT_DIR" || die "git clone failed"
   log "dotfiles installation done!"
 }
 
@@ -708,9 +708,9 @@ cmd_dotfiles() {
 
   [ -f "$HOME/.bashrc" ] || touch ~/.bashrc
 
-  if ! grep -qF 'source ~/.fedora-config/bash/bashrc' "$HOME/.bashrc"; then
+  if ! grep -qF 'source ~/.fgc/bash/bashrc' "$HOME/.bashrc"; then
     log "Updating ~/.bashrc..."
-    echo 'source ~/.fedora-config/bash/bashrc' >>"$HOME/.bashrc"
+    echo 'source ~/.fgc/bash/bashrc' >>"$HOME/.bashrc"
   else
     log "$HOME/.bashrc already updated."
   fi

@@ -1,4 +1,4 @@
-export DOT_DIR="$HOME/.fedora-config"
+export DOT_DIR="$HOME/.fgc"
 export PATH="$HOME/.local/share/flatpak/exports/bin:$DOT_DIR/scripts:$HOME/.vite-plus/bin:$HOME/bin:$HOME/.pixi/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 if ! [[ $- == *i* ]]; then

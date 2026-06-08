@@ -5,7 +5,7 @@ if test -f ~/.fish_profile
   source ~/.fish_profile
 end
 
-set -gx DOT_DIR $HOME/.fedora-config
+set -gx DOT_DIR $HOME/.fgc
 if not set -q XDG_DATA_DIRS
     set -gx XDG_DATA_DIRS /usr/local/share /usr/share
 end
@@ -96,8 +96,8 @@ else
   set -gx EDITOR $VISUAL
 end
 
-if test -f ~/.fedora-config/fish/local.fish
-  source ~/.fedora-config/fish/local.fish
+if test -f ~/.fgc/fish/local.fish
+  source ~/.fgc/fish/local.fish
 end
 
 if test -f ~/.vite-plus/env.fish
