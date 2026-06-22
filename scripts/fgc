@@ -415,14 +415,15 @@ gnome_ptyxis() {
   gsettings set "$profile" palette "Everforest"
 
   if is_atomic; then
-    gsettings set "$profile" custom-command '/usr/bin/fish'
+    local fl="$HOME/.pixi/bin/fish"
+    gsettings set "$profile" custom-command "'$fl'"
   fi
 }
 
 fonts_install() {
   has_cmd brew || brew_install
   log "Installing fonts..."
-  if brew install --cask font-jetbrains-mono-nerd-font font-fontawesome font-monaspice-nerd-font; then
+  if brew install --cask font-jetbrains-mono-nerd-font font-fontawesome font-monaspace-nerd-font; then
     fc-cache -f || true
   fi
 }
@@ -515,8 +516,8 @@ EOF
     gnome_flatpaks
     gnome_extensions
     gnome_settings
-    gnome_ptyxis
     gnome_keybindings
+    gnome_ptyxis
     gnome_wallpaper
     ;;
   *)

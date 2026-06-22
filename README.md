@@ -13,7 +13,7 @@ sudo rpm-ostree upgrade # silverblue
 Then run the following bootstrap script
 
 ```sh
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fgc/main/scripts/setup)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/pervezfunctor/fgc/main/scripts/fgc)"
 ```
 
 This script clones this repo to `~/.fgc`, and add a single line to your ~/.bashrc to put all scripts on PATH.
