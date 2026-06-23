@@ -80,6 +80,9 @@ brew_install() {
   fi
 
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+  brew tap ublue-os/tap
+  brew trust ublue-os/tap
 }
 
 pixi_install() {
@@ -719,7 +722,6 @@ cmd_dotfiles() {
 
 cmd_brew() {
   brew_install
-  brew tap ublue-os/tap
 }
 
 main() {
