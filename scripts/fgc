@@ -471,15 +471,6 @@ fonts_install() {
   fi
 }
 
-gnome_packages() {
-  fonts_install
-
-  if ! is_atomic; then
-    log "Installing system packages..."
-    sudo dnf install -y ptyxis gnome-tweaks 2>/dev/null || true
-  fi
-}
-
 gnome_gdm() {
   local -a pkgs=(
     gdm
@@ -520,37 +511,31 @@ cmd_gnome() {
 
   local subcmd="${1:-}"
   case "$subcmd" in
-  packages) gnome_packages ;;
   flatpaks) gnome_flatpaks ;;
   extensions) gnome_extensions ;;
   settings) gnome_settings ;;
   keybindings) gnome_keybindings ;;
   ptyxis) gnome_ptyxis ;;
-  wallpapers) gnome_wallpaper ;;
   theme) gnome_theme ;;
   help)
     cat <<'EOF'
 Usage: setup gnome <command>
   Available commands:
-  packages       Install GNOME packages
   flatpaks       Manage GNOME flatpaks
   extensions     Install GNOME extensions(paperwm etc)
   settings       Configure GNOME settings
   keybindings    Configure GNOME keybindings
   ptyxis         Configure Ptyxis terminal
-  wallpapers     Bluefin wallpapaers
   theme          gnome theme(everforest dark)
   help           Show this help message
 EOF
     ;;
   "")
-    gnome_packages
     gnome_flatpaks
     gnome_extensions
     gnome_settings
     gnome_keybindings
     gnome_ptyxis
-    gnome_wallpaper
     gnome_theme
     ;;
   *)
