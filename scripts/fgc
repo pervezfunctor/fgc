@@ -252,9 +252,6 @@ gnome_flatpaks() {
   for pkg in "${flatpaks[@]}"; do
     flatpak --user install -y flathub "$pkg" 2>/dev/null || true
   done
-
-  flatpak --user override --filesystem=xdg-config/gtk-3.0:rw 2>/dev/null || true
-  flatpak --user override --filesystem=xdg-config/gtk-4.0:rw 2>/dev/null || true
 }
 
 gnome_extensions() {
@@ -282,7 +279,30 @@ gnome_extensions() {
   done
 }
 
+get_profid() {
+  local profid
+  profid="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
+  if [ -z "$profid" ]; then
+    nohup some_app >/dev/null 2>&1 &
+    disown
+    sleep 1
+    profid="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
+    if [ -z "$profid" ]; then
+      error "Failed to create default profile in Ptyxis"
+      return
+    fi
+  fi
+}
+
+get_profile() {
+  local profid
+  profid=$(get_profid)
+  echo "org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/${profid}/"
+}
+
 gnome_rewaita() {
+  mkdir -p ~/.var/app/io.github.swordpuffin.rewaita/data/
+  touch ~/.var/app/io.github.swordpuffin.rewaita/data/prefs.json
   cat >~/.var/app/io.github.swordpuffin.rewaita/data/prefs.json <<EOF
   {
       "light-theme": "Everforest \ud83c\udf32.css",
@@ -300,10 +320,43 @@ gnome_rewaita() {
 EOF
 }
 
-gnome_settings() {
-  gsettings set org.gnome.desktop.input-sources xkb-options "['caps:ctrl_modifier']"
+gnome_wallpaper() {
+  if [ -f ~/.config/wallpaper/green_sea.jpg ]; then
+    return 0
+  fi
+
+  mkdir -p ~/.config/wallpaper
+  curl -L -o ~/.config/wallpaper/green_sea.jpg 'https://raw.githubusercontent.com/mylinuxforwork/wallpaper/main/green_sea.jpg'
+
+  gsettings set org.gnome.desktop.background picture-uri "$HOME/.config/wallpaper/green_sea.jpg"
+  gsettings set org.gnome.desktop.background picture-uri-dark "$HOME/.config/wallpaper/green_sea.jpg"
+  gsettings set org.gnome.desktop.screensaver picture-uri "$HOME/.config/wallpaper/green_sea.jpg"
+}
+
+gnome_ptyxis_theme() {
+  local profile
+  profile="$(get_profile)"
+  gsettings set "$profile" opacity 0.85
+  gsettings set "$profile" palette "Everforest"
+
+  gsettings set org.gnome.Ptyxis use-system-font false
+  gsettings set org.gnome.Ptyxis interface-style 'system'
+}
+
+gnome_theme() {
+  flatpak --user override --filesystem=xdg-config/gtk-3.0:rw 2>/dev/null || true
+  flatpak --user override --filesystem=xdg-config/gtk-4.0:rw 2>/dev/null || true
+
   gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
   gsettings set org.gnome.desktop.interface accent-color 'green'
+
+  gnome_ptyxis_theme
+  gnome_wallpaper
+  gnome_rewaita
+}
+
+gnome_settings() {
+  gsettings set org.gnome.desktop.input-sources xkb-options "['caps:ctrl_modifier']"
   gsettings set org.gnome.desktop.interface gtk-key-theme "Emacs"
   gsettings set org.gnome.desktop.wm.preferences resize-with-right-button true
 
@@ -330,8 +383,6 @@ gnome_settings() {
   dconf write /org/gnome/shell/extensions/paperwm/horizontal-margin 12
   dconf write /org/gnome/shell/extensions/paperwm/vertical-margin 12
   dconf write /org/gnome/shell/extensions/paperwm/vertical-margin-bottom 12
-
-  gnome_rewaita
 }
 
 gnome_keybindings() {
@@ -393,29 +444,13 @@ gnome_keybindings() {
 gnome_ptyxis() {
   log "Configuring Ptyxis"
 
-  gsettings set org.gnome.Ptyxis use-system-font false
-  gsettings set org.gnome.Ptyxis interface-style 'system'
-
   if fc-list : family 2>/dev/null | grep -qi 'jetbrains.*nerd'; then
     gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 11'
   fi
 
-  local profid
-  profid="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
-  if [ -z "$profid" ]; then
-    nohup some_app >/dev/null 2>&1 &
-    disown
-    sleep 1
-    profid="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
-    if [ -z "$profid" ]; then
-      error "Failed to create default profile in Ptyxis"
-      return
-    fi
-  fi
-
-  local profile="org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/${profid}/"
-  gsettings set "$profile" opacity 0.85
-  gsettings set "$profile" palette "Everforest"
+  local profile
+  profile=$(get_profile)
+  gnome_ptyxis_theme
 
   if is_atomic; then
     local fl="$HOME/.pixi/bin/fish"
@@ -426,7 +461,7 @@ gnome_ptyxis() {
 fonts_install() {
   has_cmd brew || brew_install
   log "Installing fonts..."
-  if brew install --cask font-jetbrains-mono-nerd-font font-fontawesome font-monaspace-nerd-font; then
+  if brew install --cask font-jetbrains-mono-nerd-font font-fontawesome; then
     fc-cache -f || true
   fi
 }
@@ -468,19 +503,6 @@ gnome_gdm() {
   log "gdm config complete. Reboot your computer"
 }
 
-gnome_wallpaper() {
-  if [ -f ~/.config/wallpaper/green_sea.jpg ]; then
-    return 0
-  fi
-
-  mkdir -p ~/.config/wallpaper
-  curl -L -o ~/.config/wallpaper/green_sea.jpg 'https://raw.githubusercontent.com/mylinuxforwork/wallpaper/main/green_sea.jpg'
-
-  gsettings set org.gnome.desktop.background picture-uri "$HOME/.config/wallpaper/green_sea.jpg"
-  gsettings set org.gnome.desktop.background picture-uri-dark "$HOME/.config/wallpaper/green_sea.jpg"
-  gsettings set org.gnome.desktop.screensaver picture-uri "$HOME/.config/wallpaper/green_sea.jpg"
-}
-
 cmd_gnome() {
   if ! has_cmd gsettings; then
     error "gsettings not found, skipping gnome setup"
@@ -500,6 +522,7 @@ cmd_gnome() {
   keybindings) gnome_keybindings ;;
   ptyxis) gnome_ptyxis ;;
   wallpapers) gnome_wallpaper ;;
+  theme) gnome_theme ;;
   help)
     cat <<'EOF'
 Usage: setup gnome <command>
@@ -511,6 +534,7 @@ Usage: setup gnome <command>
   keybindings    Configure GNOME keybindings
   ptyxis         Configure Ptyxis terminal
   wallpapers     Bluefin wallpapaers
+  theme          gnome theme(everforest dark)
   help           Show this help message
 EOF
     ;;
@@ -522,6 +546,7 @@ EOF
     gnome_keybindings
     gnome_ptyxis
     gnome_wallpaper
+    gnome_theme
     ;;
   *)
     error "Unknown command: $subcmd"
